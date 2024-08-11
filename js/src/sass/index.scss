@@ -34,6 +34,13 @@
   margin: 0 auto;
   padding-top: 80px;
   text-align: center;
+  &__list {
+    padding: 40px 16px;
+    text-align: left;
+    li {
+      cursor: pointer;
+    }
+  }
   textarea {
     display: block;
     width: 100%;

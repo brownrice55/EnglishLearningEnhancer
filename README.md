@@ -16,11 +16,11 @@ Could you please let me know if there are any errors in my English or code?</p>
 # EnglishLearningEnhancer
 > 英語力強化アプリ
 
-##概要
+## 概要
 <p>This app is designed exclusively for me to learn English joyfully and enhance my reading speed, hopefully allowing me to read and listen with precision.</p>
 <p>楽しみながら学べて、英語を読む速度を上げたり、しっかりと読める、聞けるようになる練習をするための、自分のためのアプリです。</p>
 
-##機能
+## 機能
 <ul>
 <li>speed reading<br>速読</li>
 <li>typing<br>写経</li>
@@ -29,3 +29,14 @@ Could you please let me know if there are any errors in my English or code?</p>
 
 <p>In addition to the functionalities mentioned above, I will include features for adding new data, editing existing data, and deleting data.</p>
 <p>上記以外に、データの新規追加、編集、削除ができます。</p>
+
+## メモ
+<ul>
+<li><br>それぞれの画面でランダムに表示する。</li>
+<li><br>パス名の保管は任意。音声データのパスがない場合は自動音声を使う。</li>
+<li><br></li>
+<li><br></li>
+<li><br></li>
+<li><br></li>
+<li><br></li>
+</ul>
