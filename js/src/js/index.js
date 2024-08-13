@@ -9,15 +9,19 @@
     this.section = document.querySelectorAll('section');
     this.pageData = localStorage.getItem('pageData') || '';
     this.navLiElms = document.querySelectorAll('.js-nav li');
+    this.settingsElm = document.querySelector('.js-settings');
   };
 
   Activation.prototype.selectPage = function() {
+    for(let cnt=0,len=this.section.length;cnt<len;++cnt) {
+      this.section[cnt].classList.add('disp--none');
+    }
     if(this.pageData) {
       const pageNameArray = ['speedreading', 'typing', 'dictation'];
       for(let cnt=0,len=pageNameArray.length;cnt<len;++cnt) {
         if(this.pageData==pageNameArray[cnt]) {
           let pageElms = document.querySelector('.js-' + pageNameArray[cnt]);
-          pageElms[cnt].classList.remove('disp--none');  
+          pageElms.classList.remove('disp--none');  
         }  
       }
     }
@@ -27,14 +31,27 @@
     }
   };
 
-  Activation.prototype.setEvent = function() {
-    for(let cnt=0,len=this.section.length;cnt<len;++cnt) {
-      this.section[cnt].classList.add('disp--none');
-    }
+  Activation.prototype.setPageName = function() {
+    localStorage.setItem('pageData', this.pageData);
     this.selectPage();
   };
 
+  Activation.prototype.setEvent = function() {
+    let that = this;
+    for(let cnt=0,len=this.navLiElms.length;cnt<len;++cnt) {
+      this.navLiElms[cnt].addEventListener('click', function() {
+        that.pageData = this.dataset.page;
+        that.setPageName();
+      });
+    }
+    this.settingsElm.addEventListener('click', function() {
+      that.pageData = '';
+      that.setPageName();
+    });
+  };
+
   Activation.prototype.run = function() {
+    this.selectPage();
     this.setEvent();
   };
 
