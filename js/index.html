@@ -10,7 +10,7 @@
   <header class="header">
     <div>
       <nav class="header__nav">
-        <ul>
+        <ul class="js-nav">
           <li>速読</li>
           <li>写経</li>
           <li>ディクテーション</li>
@@ -26,11 +26,15 @@
     <section class="js-registration">
       <h2>新規登録</h2>
       <div>
-        <h3>英文※</h3>
+        <h3>英文<span class="required">※</span></h3>
         <textarea class="js-input"></textarea>
       </div>
       <div>
-        <h3>日本語訳※</h3>
+        <h3>日本語訳<span class="required">※</span></h3>
+        <textarea class="js-input"></textarea>
+      </div>
+      <div>
+        <h3>備考</h3>
         <textarea class="js-input"></textarea>
       </div>
       <div>
@@ -38,10 +42,10 @@
         <input type="text" class="js-input">
       </div>
       <div>
-        <button class="js-save">保存</button>
+        <button class="js-save" data-index="n">保存</button>
       </div>
       <div class="main__list">
-        <h3>登録済み</h3>
+        <h3 class="main__list__title js-listTitle">登録済み</h3>
         <ul class="js-list"></ul>
       </div>
     </section>
