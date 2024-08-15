@@ -32,11 +32,11 @@ Could you please let me know if there are any errors in my English or code?</p>
 
 ## メモ
 <ul>
-<li><br>それぞれの画面でランダムに表示する。</li>
+<li><br>それぞれの画面で文章のデータをランダムに表示する。</li>
 <li><br>パス名の保管は任意。音声データのパスがない場合は自動音声を使う。</li>
-<li><br></li>
-<li><br></li>
-<li><br></li>
+<li><br>WPMを保存して経過を確認できるようにしたい。</li>
+<li><br>速読のページにテキストエリアを設けて、きちんと訳す練習ができるようにするか検討。</li>
+<li><br>速く読めた文章はしばらく表示しないようにしたい。</li>
 <li><br></li>
 <li><br></li>
 </ul>

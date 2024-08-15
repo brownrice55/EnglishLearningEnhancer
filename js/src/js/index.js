@@ -17,7 +17,7 @@
       this.section[cnt].classList.add('disp--none');
     }
     if(this.pageData) {
-      const pageNameArray = ['speedreading', 'typing', 'dictation'];
+      const pageNameArray = ['speedreading', 'typing', 'writing', 'dictation'];
       for(let cnt=0,len=pageNameArray.length;cnt<len;++cnt) {
         if(this.pageData==pageNameArray[cnt]) {
           let pageElms = document.querySelector('.js-' + pageNameArray[cnt]);
@@ -66,12 +66,14 @@
     this.inputElms = document.querySelectorAll('.js-input');
     this.listLiElms = document.querySelectorAll('.js-list li');
 
+    // ** 読み込みを1箇所にしたい 後で
     this.sentencesData = new Map();
     let sentencesData = localStorage.getItem('sentencesData');
     if(sentencesData!=='undefined') {
       const sentencesDataJson = JSON.parse(sentencesData);
       this.sentencesData = new Map(sentencesDataJson);
     }
+    // ** 読み込みを1箇所にしたい 後で
     this.showList();
   };
 
@@ -128,12 +130,90 @@
     this.setEvent();
   };
 
+  const Speedreading = function() {
+    this.initialize.apply(this, arguments);
+  };
+
+  Speedreading.prototype.initialize = function() {
+    // ** 読み込みを1箇所にしたい 後で
+    this.sentencesData = new Map();
+    let sentencesData = localStorage.getItem('sentencesData');
+    if(sentencesData!=='undefined') {
+      const sentencesDataJson = JSON.parse(sentencesData);
+      this.sentencesData = new Map(sentencesDataJson);
+    }
+    // ** 読み込みを1箇所にしたい 後で
+
+    this.speedreadingTextElm = document.querySelector('.js-speedreadingText');
+    this.startReadingBtnElm = document.querySelector('.js-startReading');
+    this.cnt = 0;
+
+    this.startTime = 0;
+    this.wpm = 0;
+  };
+
+  Speedreading.prototype.showSentence = function() {
+    this.sentenceDataArray = [...this.sentencesData];
+
+    const getRandomIndexArray = (aLength) => {
+      let len = aLength;
+      let array = [];
+      for(let cnt=0;cnt<len;++cnt) {
+        array[cnt] = cnt;
+      }
+      const getRandomNum = (min, max) => {
+        return Math.floor(Math.random()*(max-min)+min);
+      }
+      for(let cnt=len-1;cnt>0;--cnt) {
+        const random = getRandomNum(0, cnt+1);
+        [array[cnt],array[random]] = [array[random],array[cnt]];
+      }
+      return array;
+    };
+
+    this.randomIndexArray = getRandomIndexArray(this.sentenceDataArray.length);
+    this.speedreadingTextElm.innerHTML = '<p>' + this.sentenceDataArray[this.randomIndexArray[0]][1].en + '</p>';
+  };
+
+  Speedreading.prototype.setEvent = function() {
+    let that = this;
+    let div = document.createElement('div');
+    let currentSentenceData = '';
+    this.startReadingBtnElm.addEventListener('click', function() {
+      if(!that.cnt) {
+        that.speedreadingTextElm.classList.remove('disp--none');
+      }
+      if(that.cnt%2) {
+        let timeTaken = (Date.now() - this.startTime)/1000;
+        currentSentenceData = that.sentenceDataArray[that.randomIndexArray[0]][1];
+        this.wpm = currentSentenceData.num/timeTaken*60;
+        let note = (currentSentenceData.note) ? '<p>' + currentSentenceData.note + '</p>' : '';
+        div.innerHTML = '<p>' + currentSentenceData.jp + '</p>' + note + '<p>単語数：' + currentSentenceData.num + '語　かかった時間：' + timeTaken + '秒　WPM：' + Math.round(this.wpm) + '</p>';
+        that.speedreadingTextElm.appendChild(div);
+        that.startReadingBtnElm.innerHTML = '次の文章';
+      }
+      else {
+        that.speedreadingTextElm.innerHTML = '<p>' + that.sentenceDataArray[that.randomIndexArray[that.cnt/2]][1].en + '</p>';
+        that.startReadingBtnElm.innerHTML = '読了';
+        this.startTime = Date.now();
+      }
+      ++that.cnt;
+    });
+  };
+
+  Speedreading.prototype.run = function() {
+    this.showSentence();
+    this.setEvent();
+  };
+
   window.addEventListener('DOMContentLoaded', function() {
     let activation = new Activation();
     activation.run();
 
     let dataManagement = new DataManagement();
     dataManagement.run();
-  });
 
+    let speedreading = new Speedreading();
+    speedreading.run();
+  });
 }());
