@@ -9,6 +9,12 @@ $colorLightGray: #f0f0f0;
   @return math.div($px, 16px) * 1rem;
 }
 
+@mixin p {
+  text-align: left;
+  width: 100%;
+  padding: 16px;
+}
+
 .header {
   position: fixed;
   width: 100%;
@@ -75,11 +81,15 @@ $colorLightGray: #f0f0f0;
     padding: 16px 32px;
     outline: 0;
   }
-  p {
-    text-align: left;
-    width: 100%;
-    padding: 16px;
+  &__text {
+    @include p;
+    line-height: 2;
     background:  #ffe;
+  }
+  &__note {
+    @include p;
+    line-height: 1.8;
+    font-size: rem(14px);
   }
 }
 

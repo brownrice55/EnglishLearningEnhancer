@@ -24,6 +24,7 @@ Could you please let me know if there are any errors in my English or code?</p>
 <ul>
 <li>speed reading<br>速読</li>
 <li>typing<br>写経</li>
+<li>writing<br>ライティング</li>
 <li>dictation<br>ディクテーション</li>
 </ul>
 
@@ -40,3 +41,6 @@ Could you please let me know if there are any errors in my English or code?</p>
 <li><br></li>
 <li><br></li>
 </ul>
+
+## 参考
+<li>https://janken.asotetu.work/js_tip/</li>
