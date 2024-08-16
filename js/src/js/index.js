@@ -94,7 +94,7 @@
     this.listLiElms = document.querySelectorAll('.js-list li');
   };
 
-  DataManagement.prototype.saveData = function(aIndex, aEn, aJp, aSlash, aNote, aPath) {
+  DataManagement.prototype.saveData = function(aIndex, aEn, aSlashEn, aJp, aSlashJp, aNote, aPath) {
     for(let cnt=0,len=this.inputElms.length-2;cnt<len;++cnt) {
       if(!this.inputElms[cnt].value) {
         return;
@@ -102,7 +102,7 @@
     }
     let id = (aIndex=='n') ? this.sentencesData.size+1 : parseInt(aIndex);
     let numArray = this.inputElms[0].value.split(' ');
-    this.sentencesData.set(id, { en:aEn, jp:aJp, slash:aSlash, note:aNote, path:aPath, num:numArray.length});
+    this.sentencesData.set(id, { en:aEn, slashEn:aSlashEn, jp:aJp, slashJp:aSlashJp, note:aNote, path:aPath, num:numArray.length});
     localStorage.setItem('sentencesData', JSON.stringify([...this.sentencesData]));
     window.location.reload(false);
   };
@@ -110,7 +110,7 @@
   DataManagement.prototype.setEvent = function() {
     let that = this;
     this.saveBtnElm.addEventListener('click', function() {
-      that.saveData(this.dataset.index, that.inputElms[0].value, that.inputElms[1].value, that.inputElms[2].value, that.inputElms[3].value, that.inputElms[4].value);
+      that.saveData(this.dataset.index, that.inputElms[0].value, that.inputElms[1].value, that.inputElms[2].value, that.inputElms[3].value, that.inputElms[4].value, that.inputElms[5].value);
     });
     let id = 0;
     let selectedData = new Map();
@@ -119,10 +119,11 @@
         id = this.dataset.index;
         selectedData = that.sentencesData.get(parseInt(id));
         that.inputElms[0].value = selectedData.en;
-        that.inputElms[1].value = selectedData.jp;
-        that.inputElms[2].value = selectedData.slash;
-        that.inputElms[3].value = selectedData.note;
-        that.inputElms[4].value = selectedData.path;
+        that.inputElms[1].value = selectedData.slashEn;
+        that.inputElms[2].value = selectedData.jp;
+        that.inputElms[3].value = selectedData.slashJp;
+        that.inputElms[4].value = selectedData.note;
+        that.inputElms[5].value = selectedData.path;
         that.saveBtnElm.dataset.index = id;
         that.saveBtnElm.innerHTML = '上書き保存';
       });
@@ -160,6 +161,11 @@
     this.typingTextElm = document.querySelector('.js-typingText');
     // typing
 
+    // writing
+    this.writingTextElm = document.querySelector('.js-writingText');
+    this.writingInputElm = document.querySelector('.js-writingInput');
+    this.writingBtnElm = document.querySelector('.js-writingBtn');
+    // writing
   };
 
   Enhancer.prototype.getRandomIndexArray = function(aLength) {
@@ -186,43 +192,48 @@
       this.speedreadingTextElm.innerHTML = '<p class="main__text">' + this.sentenceDataArray[this.randomIndexArray[0]][1].en + '</p>';  
     }
     else if(this.pageData=='typing') {
-      this.typingTextElm.innerHTML = '<p>キーボードのキーを押すとスタートします。</p>';
+      this.typingTextElm.innerHTML = '<p>英文を訳しながらタイピングしましょう。<br>キーボードのキーを押すとスタートします。</p>';
+    }
+    else if(this.pageData=='writing') {
+      let initialSentenceData = this.sentenceDataArray[this.randomIndexArray[0]][1];
+      note = (initialSentenceData.note) ? '<p class="main__note">ヒント：' + initialSentenceData.note + '</p>' : '';
+      this.writingTextElm.innerHTML = '<p class="main__text">' + initialSentenceData.jp + '</p>';  
     }
   };
 
   Enhancer.prototype.setEvent = function() {
     let that = this;
     let div = document.createElement('div');
-    let currentIndex = 0;
     let currentSentenceData = '';
     let note = '';
+    let cnt = 0;
     if(this.pageData=='speedreading') {
       this.startReadingBtnElm.addEventListener('click', function() {
-        if(!currentIndex) {
+        if(!cnt) {
           that.speedreadingTextElm.classList.remove('disp--none');
         }
-        if(currentIndex%2) {
+        if(cnt%2) {
           let timeTaken = (Date.now()-this.startTime)/1000;
-          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((currentIndex+1)/2)-1]][1];
+          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((cnt+1)/2)-1]][1];
           this.wpm = currentSentenceData.num/timeTaken*60;
           that.speedreadingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en + '</p>';
           note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
-          div.innerHTML = '<p class="main__note">' + currentSentenceData.slash + '</p>' + note + '<p class="main__note">' + currentSentenceData.jp + '</p><p class="main__note">単語数：' + currentSentenceData.num + '語　かかった時間：' + timeTaken + '秒　WPM：' + Math.round(this.wpm) + '</p>';
+          div.innerHTML = '<p class="main__note">' + currentSentenceData.slashJp + '</p>' + note + '<p class="main__note">' + currentSentenceData.jp + '</p><p class="main__note">単語数：' + currentSentenceData.num + '語　かかった時間：' + timeTaken + '秒　WPM：' + Math.round(this.wpm) + '</p>';
           that.speedreadingTextElm.appendChild(div);
           that.startReadingBtnElm.innerHTML = '次の文章';
         }
         else {
-          that.speedreadingTextElm.innerHTML = '<p class="main__text">' + that.sentenceDataArray[that.randomIndexArray[currentIndex/2]][1].en + '</p>';
+          that.speedreadingTextElm.innerHTML = '<p class="main__text">' + that.sentenceDataArray[that.randomIndexArray[(cnt/2)]][1].en + '</p>';
           that.startReadingBtnElm.innerHTML = '読了';
           this.startTime = Date.now();
         }
-        ++currentIndex;
+        ++cnt;
       });
     }
     else if(this.pageData=='typing') {
+      let currentIndex = 0;
       currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
       note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
-      let cnt = 0;
       let len = currentSentenceData.en.length;
 
       const typing = (event) => {
@@ -242,11 +253,28 @@
           }
         }
         note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
-        div.innerHTML = '<p class="main__note">' + currentSentenceData.slash + '</p>' + note + '<p class="main__note">' + currentSentenceData.jp + '</p>';
+        div.innerHTML = '<p class="main__note">' + currentSentenceData.slashJp + '</p>' + note + '<p class="main__note">' + currentSentenceData.jp + '</p>';
         this.typingTextElm.appendChild(div);
       }
 
       window.addEventListener('keydown', typing);
+    }
+    else if(this.pageData=='writing') {
+      this.writingBtnElm.addEventListener('click', function() {
+        ++cnt;
+        if(cnt%2) {//result
+          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((cnt+1)/2)-1]][1];
+          that.writingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.jp + '<br>' + currentSentenceData.en + '</p>';
+          this.innerHTML = '次へ';
+        }
+        else {
+          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[(cnt/2)]][1];
+          note = (currentSentenceData.note) ? '<p class="main__note">ヒント：' + currentSentenceData.note + '</p>' : '';
+          that.writingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.jp + '</p>' + note;
+          that.writingInputElm.value = '';
+          this.innerHTML = '確認';
+        }
+      });
     }
   };
 

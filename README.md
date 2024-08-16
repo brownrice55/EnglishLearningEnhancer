@@ -38,6 +38,8 @@ Could you please let me know if there are any errors in my English or code?</p>
 <li><br>WPMを保存して経過を確認できるようにしたい。</li>
 <li><br>速読のページにテキストエリアを設けて、きちんと訳す練習ができるようにするか検討。</li>
 <li><br>速く読めた文章はしばらく表示しないようにしたい。</li>
+<li><br>入力の際にスラッシュの数が違う時にアラートを出す。</li>
+<li><br></li>
 <li><br></li>
 <li><br></li>
 </ul>
