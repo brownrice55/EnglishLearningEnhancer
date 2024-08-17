@@ -151,7 +151,9 @@
 
     // speed reading
     this.speedreadingTextElm = document.querySelector('.js-speedreadingText');
-    this.startReadingBtnElm = document.querySelector('.js-startReading');
+    this.speedreadingBtnElm = document.querySelector('.js-speedreadingBtn');
+    this.speedreadingWpmElm = document.querySelector('.js-speedreadingWpm');
+    this.speedreadingWpmSelectElm = this.speedreadingWpmElm.querySelector('select');
 
     this.startTime = 0;
     this.wpm = 0;
@@ -207,24 +209,28 @@
     let currentSentenceData = '';
     let note = '';
     let cnt = 0;
+    let wpm = 0;
     if(this.pageData=='speedreading') {
-      this.startReadingBtnElm.addEventListener('click', function() {
+      this.speedreadingBtnElm.addEventListener('click', function() {
         if(!cnt) {
           that.speedreadingTextElm.classList.remove('disp--none');
+          that.speedreadingWpmElm.classList.add('disp--none');
+          wpm = that.speedreadingWpmSelectElm.value;
         }
         if(cnt%2) {
           let timeTaken = (Date.now()-this.startTime)/1000;
           currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((cnt+1)/2)-1]][1];
           this.wpm = currentSentenceData.num/timeTaken*60;
+          let wpmComment = (this.wpm>=wpm) ? '目標達成！': 'もう少し頑張ろう！';
           that.speedreadingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en + '</p>';
           note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
-          div.innerHTML = '<p class="main__note">' + currentSentenceData.slashJp + '</p>' + note + '<p class="main__note">' + currentSentenceData.jp + '</p><p class="main__note">単語数：' + currentSentenceData.num + '語　かかった時間：' + timeTaken + '秒　WPM：' + Math.round(this.wpm) + '</p>';
+          div.innerHTML = '<p class="main__note">' + currentSentenceData.slashEn + '<br>' + currentSentenceData.slashJp + '</p>' + note + '<p class="main__note">' + currentSentenceData.jp + '</p><p class="main__note">単語数：' + currentSentenceData.num + '語　かかった時間：' + timeTaken + '秒　WPM：' + Math.round(this.wpm) + '（' + wpmComment + '）</p>';
           that.speedreadingTextElm.appendChild(div);
-          that.startReadingBtnElm.innerHTML = '次の文章';
+          that.speedreadingBtnElm.innerHTML = '次の文章';
         }
         else {
           that.speedreadingTextElm.innerHTML = '<p class="main__text">' + that.sentenceDataArray[that.randomIndexArray[(cnt/2)]][1].en + '</p>';
-          that.startReadingBtnElm.innerHTML = '読了';
+          that.speedreadingBtnElm.innerHTML = '読了';
           this.startTime = Date.now();
         }
         ++cnt;
@@ -264,7 +270,9 @@
         ++cnt;
         if(cnt%2) {//result
           currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((cnt+1)/2)-1]][1];
-          that.writingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.jp + '<br>' + currentSentenceData.en + '</p>';
+          that.writingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.jp + '</p>';
+          div.innerHTML = '<p class="main__text">' + currentSentenceData.en + '</p>';
+          that.writingBtnElm.before(div);
           this.innerHTML = '次へ';
         }
         else {
@@ -272,6 +280,7 @@
           note = (currentSentenceData.note) ? '<p class="main__note">ヒント：' + currentSentenceData.note + '</p>' : '';
           that.writingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.jp + '</p>' + note;
           that.writingInputElm.value = '';
+          div.innerHTML = '';
           this.innerHTML = '確認';
         }
       });
