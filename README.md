@@ -45,4 +45,10 @@ Could you please let me know if there are any errors in my English or code?</p>
 </ul>
 
 ## 参考
+<ul>
 <li>https://janken.asotetu.work/js_tip/</li>
+<li>https://developer.mozilla.org/ja/docs/Web/API/SpeechSynthesis</li>
+<li>https://web-creates.com/code/js-web-speech-api/</li>
+<li>https://1-notes.com/javascript-speechsynthesisutterance-pause-and-resume/</li>
+<li>https://www.cyokodog.net/blog/web-speechi-api/</li>
+</ul>
