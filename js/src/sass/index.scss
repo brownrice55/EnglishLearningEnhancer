@@ -91,6 +91,12 @@ $colorLightGray: #f0f0f0;
     line-height: 1.8;
     font-size: rem(14px);
   }
+  &__nav {
+    li {
+      cursor: pointer;
+      display: inline-block;
+    }
+  }
 }
 
 .disp--none {

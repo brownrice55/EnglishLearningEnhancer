@@ -39,6 +39,9 @@ Could you please let me know if there are any errors in my English or code?</p>
 <li><br>速読のページにテキストエリアを設けて、きちんと訳す練習ができるようにするか検討。</li>
 <li><br>速く読めた文章はしばらく表示しないようにしたい。</li>
 <li><br>入力の際にスラッシュの数が違う時にアラートを出す。</li>
+<li><br>写経はスラッシュ区切りのタイピングもできるようにする。</li>
+<li><br>速読のページにストップウォッチを表示（読むときに焦るようにする）。</li>
+<li><br></li>
 <li><br></li>
 <li><br></li>
 <li><br></li>
@@ -51,4 +54,18 @@ Could you please let me know if there are any errors in my English or code?</p>
 <li>https://web-creates.com/code/js-web-speech-api/</li>
 <li>https://1-notes.com/javascript-speechsynthesisutterance-pause-and-resume/</li>
 <li>https://www.cyokodog.net/blog/web-speechi-api/</li>
+</ul>
+
+### Fisher-Yates shuffle関連 
+<ul>
+<li>https://tech-blog.s-yoshiki.com/entry/281</li>
+<li>https://www.sejuku.net/blog/22432</li>
+<li>https://chooblarin.com/post/array-shuffle/</li>
+<li>https://qiita.com/may88seiji/items/69d5b05dff2c9d059155</li>
+<li>https://zenn.dev/yoheimuta/articles/89e9b85e01fc4f</li>
+</ul>
+
+### reset css
+<ul>
+<li>https://github.com/nicolas-cusan/destyle.css</li>
 </ul>

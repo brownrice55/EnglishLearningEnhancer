@@ -7,3 +7,4 @@ js/node_modules/
 js/package-lock.json
 js/package.json
 js/src/sass/_destyle.scss
+js/audio/
