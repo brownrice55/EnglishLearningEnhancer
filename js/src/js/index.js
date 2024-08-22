@@ -163,6 +163,9 @@
 
     // typing
     this.typingTextElm = document.querySelector('.js-typingText');
+    this.typingInitialElm = document.querySelector('.js-typingInitial');
+    this.typingInitialCheckElm = this.typingInitialElm.querySelector('input');
+    this.typingInitialBtnElm = this.typingInitialElm.querySelector('button');
     // typing
 
     // writing
@@ -258,25 +261,79 @@
       note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
       let len = currentSentenceData.en.length;
 
+      // slash
+      let currentSlashEnArray = currentSentenceData.slashEn.split(' / ');
+      let currentSlashJpArray = currentSentenceData.slashJp.split(' / ');
+      let cnt1 = 0;
+      let len1 = currentSlashEnArray[0].length;
+      // slash
+
+      let isChecked = false;
+      this.typingInitialBtnElm.addEventListener('click', function() {
+        isChecked = that.typingInitialCheckElm.checked;
+        this.parentNode.classList.add('disp--none');
+        that.typingTextElm.classList.remove('disp--none');
+      });
+
+      let slashResult = '';
       const typing = (event) => {
         let keyCode = event.key;
-        if(len==len-cnt) {
-          that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
-        }
-        if(that.sentenceDataArray[that.randomIndexArray[currentIndex]][1].en.charAt(cnt)==keyCode) {
-          ++cnt;
-          that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
-          if(!(len-cnt)){//next
-            ++currentIndex;
-            currentSentenceData = that.sentenceDataArray[that.randomIndexArray[currentIndex]][1];
-            cnt = 0;
-            len = currentSentenceData.en.length;
-            that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
+
+        const slashSentence = () => {
+          if(len1==len1-cnt1) {
+            slashResult = '<p class="main__text">' + currentSlashEnArray[cnt].substring(cnt1, len1) + '<br>';
+            slashResult += currentSlashJpArray[cnt] + '</p>';
+            note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
+            that.typingTextElm.innerHTML = slashResult + note + '<p class="main__note">' + currentSentenceData.en + '<br>' + currentSentenceData.jp + '</p>';
+          }
+          if(currentSlashEnArray[cnt].charAt(cnt1)==keyCode) {
+            ++cnt1;
+            slashResult = '<p class="main__text">' + currentSlashEnArray[cnt].substring(cnt1, len1) + '<br>';
+            slashResult += currentSlashJpArray[cnt] + '</p>';
+            note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
+            that.typingTextElm.innerHTML = slashResult + note + '<p class="main__note">' + currentSentenceData.en + '<br>' + currentSentenceData.jp + '</p>';
           }
         }
-        note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
-        div.innerHTML = '<p class="main__note">' + currentSentenceData.slashJp + '</p>' + note + '<p class="main__note">' + currentSentenceData.jp + '</p>';
-        this.typingTextElm.appendChild(div);
+
+        if(isChecked) {
+          slashSentence();
+          if(!(len1-cnt1)){//next index
+            ++cnt;
+            cnt1 = 0;
+            if(currentSlashEnArray[cnt]) {
+              len1 = currentSlashEnArray[cnt].length;
+              slashSentence();
+            }
+            else {
+              ++currentIndex;
+              cnt = 0;
+              currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
+              currentSlashEnArray = currentSentenceData.slashEn.split(' / ');
+              currentSlashJpArray = currentSentenceData.slashJp.split(' / ');
+              len1 = currentSlashEnArray[cnt].length;
+              slashSentence();
+            }
+          }
+        }
+        else {
+          if(len==len-cnt) {
+            that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
+          }
+          if(that.sentenceDataArray[that.randomIndexArray[currentIndex]][1].en.charAt(cnt)==keyCode) {
+            ++cnt;
+            that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
+            if(!(len-cnt)){//next
+              ++currentIndex;
+              currentSentenceData = that.sentenceDataArray[that.randomIndexArray[currentIndex]][1];
+              cnt = 0;
+              len = currentSentenceData.en.length;
+              that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
+            }
+          }
+          note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
+          div.innerHTML = note + '<p class="main__note">' + currentSentenceData.jp + '</p>';
+          this.typingTextElm.appendChild(div);  
+        }
       }
       window.addEventListener('keydown', typing);
     }
