@@ -209,7 +209,7 @@
       this.typingTextElm.innerHTML = '<p>英文を訳しながらタイピングしましょう。<br>キーボードのキーを押すとスタートします。</p>';
     }
     else if(this.pageData=='writing') {
-      note = (initialSentenceData.note) ? '<p class="main__note">ヒント：' + initialSentenceData.note + '</p>' : '';
+      note = (initialSentenceData.note) ? '<p class="main__note">ヒント：' + initialSentenceData.note.replace(/,/g, '　') + '</p>' : '';
       this.writingTextElm.innerHTML = '<p class="main__text">' + initialSentenceData.jp + '</p>';  
     }
     else if(this.pageData=='dictation') {
@@ -242,7 +242,7 @@
           this.wpm = currentSentenceData.num/timeTaken*60;
           let wpmComment = (this.wpm>=wpm) ? '目標達成！': 'もう少し頑張ろう！';
           that.speedreadingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en + '</p>';
-          note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
+          note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
           div.innerHTML = '<p class="main__note">' + currentSentenceData.slashEn + '<br>' + currentSentenceData.slashJp + '</p>' + note + '<p class="main__note">' + currentSentenceData.jp + '</p><p class="main__note">単語数：' + currentSentenceData.num + '語　かかった時間：' + timeTaken + '秒　WPM：' + Math.round(this.wpm) + '（' + wpmComment + '）</p>';
           that.speedreadingTextElm.appendChild(div);
           that.speedreadingBtnElm.innerHTML = '次の文章';
@@ -258,12 +258,13 @@
     else if(this.pageData=='typing') {
       let currentIndex = 0;
       currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
-      note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
+      note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
       let len = currentSentenceData.en.length;
 
       // slash
       let currentSlashEnArray = currentSentenceData.slashEn.split(' / ');
       let currentSlashJpArray = currentSentenceData.slashJp.split(' / ');
+      let currentNoteArray = currentSentenceData.note.split(',');
       let cnt1 = 0;
       let len1 = currentSlashEnArray[0].length;
       // slash
@@ -280,17 +281,13 @@
         let keyCode = event.key;
 
         const slashSentence = () => {
-          if(len1==len1-cnt1) {
+          if(len1==len1-cnt1 || currentSlashEnArray[cnt].charAt(cnt1)==keyCode) {
+            if(currentSlashEnArray[cnt].charAt(cnt1)==keyCode) {
+              ++cnt1;
+            }
             slashResult = '<p class="main__text">' + currentSlashEnArray[cnt].substring(cnt1, len1) + '<br>';
             slashResult += currentSlashJpArray[cnt] + '</p>';
-            note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
-            that.typingTextElm.innerHTML = slashResult + note + '<p class="main__note">' + currentSentenceData.en + '<br>' + currentSentenceData.jp + '</p>';
-          }
-          if(currentSlashEnArray[cnt].charAt(cnt1)==keyCode) {
-            ++cnt1;
-            slashResult = '<p class="main__text">' + currentSlashEnArray[cnt].substring(cnt1, len1) + '<br>';
-            slashResult += currentSlashJpArray[cnt] + '</p>';
-            note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
+            note = (currentNoteArray[cnt]) ? '<p class="main__note">' + currentNoteArray[cnt] + '</p>' : '';
             that.typingTextElm.innerHTML = slashResult + note + '<p class="main__note">' + currentSentenceData.en + '<br>' + currentSentenceData.jp + '</p>';
           }
         }
@@ -310,6 +307,7 @@
               currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
               currentSlashEnArray = currentSentenceData.slashEn.split(' / ');
               currentSlashJpArray = currentSentenceData.slashJp.split(' / ');
+              currentNoteArray = currentSentenceData.note.split(',');
               len1 = currentSlashEnArray[cnt].length;
               slashSentence();
             }
@@ -330,7 +328,7 @@
               that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
             }
           }
-          note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note + '</p>' : '';
+          note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
           div.innerHTML = note + '<p class="main__note">' + currentSentenceData.jp + '</p>';
           this.typingTextElm.appendChild(div);  
         }
@@ -349,7 +347,7 @@
         }
         else {
           currentSentenceData = that.sentenceDataArray[that.randomIndexArray[(cnt/2)]][1];
-          note = (currentSentenceData.note) ? '<p class="main__note">ヒント：' + currentSentenceData.note + '</p>' : '';
+          note = (currentSentenceData.note) ? '<p class="main__note">ヒント：' + currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
           that.writingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.jp + '</p>' + note;
           that.writingInputElm.value = '';
           div.innerHTML = '';
