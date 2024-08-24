@@ -41,7 +41,6 @@ Could you please let me know if there are any errors in my English or code?</p>
 <li><br>入力の際にスラッシュの数が違う時にアラートを出す。</li>
 <li><br>写経はスラッシュ区切りのタイピングもできるようにする。</li>
 <li><br>速読のページにストップウォッチを表示（読むときに焦るようにする）。</li>
-<li><br>英訳の入力は、スラッシュ付きとそうでない文章を別々に入力せずに、スラッシュ付きのみにしても良いのかも？（要検討）</li>
 <li><br></li>
 <li><br></li>
 <li><br></li>

@@ -67,6 +67,7 @@
     this.saveBtnElm = document.querySelector('.js-save');
     this.listElm = document.querySelector('.js-list');
     this.listTitleElm = document.querySelector('.js-listTitle');
+    this.listTitleSpanElm = this.listTitleElm.querySelector('span');
     this.inputElms = document.querySelectorAll('.js-input');
     this.listLiElms = document.querySelectorAll('.js-list li');
 
@@ -89,22 +90,26 @@
       this.listTitleElm.classList.add('disp--none');
     }
     let showList = '';
+    let cnt = 0;
     this.sentencesData.forEach((value, key) => {
       showList += '<li data-index="' + key + '">' + value.en + '</li>';
+      ++cnt;
     });
     this.listElm.innerHTML = showList;
+    this.listTitleSpanElm.innerHTML = cnt + '件';
     this.listLiElms = document.querySelectorAll('.js-list li');
   };
 
-  DataManagement.prototype.saveData = function(aIndex, aEn, aSlashEn, aJp, aSlashJp, aNote, aPath) {
+  DataManagement.prototype.saveData = function(aIndex, aSlashEn, aJp, aSlashJp, aNote, aPath) {
     for(let cnt=0,len=this.inputElms.length-2;cnt<len;++cnt) {
       if(!this.inputElms[cnt].value) {
         return;
       }
     }
     let id = (aIndex=='n') ? this.sentencesData.size+1 : parseInt(aIndex);
-    let numArray = this.inputElms[0].value.split(' ');
-    this.sentencesData.set(id, { en:aEn, slashEn:aSlashEn, jp:aJp, slashJp:aSlashJp, note:aNote, path:aPath, num:numArray.length});
+    let enString = this.inputElms[0].value.replace(/\//g, ' ');
+    let enStringArray = enString.split(' ');
+    this.sentencesData.set(id, { en:enString, slashEn:aSlashEn, jp:aJp, slashJp:aSlashJp, note:aNote, path:aPath, num:enStringArray.length});
     localStorage.setItem('sentencesData', JSON.stringify([...this.sentencesData]));
     window.location.reload(false);
   };
@@ -112,7 +117,7 @@
   DataManagement.prototype.setEvent = function() {
     let that = this;
     this.saveBtnElm.addEventListener('click', function() {
-      that.saveData(this.dataset.index, that.inputElms[0].value, that.inputElms[1].value, that.inputElms[2].value, that.inputElms[3].value, that.inputElms[4].value, that.inputElms[5].value);
+      that.saveData(this.dataset.index, that.inputElms[0].value, that.inputElms[1].value, that.inputElms[2].value, that.inputElms[3].value, that.inputElms[4].value);
     });
     let id = 0;
     let selectedData = new Map();
@@ -120,12 +125,11 @@
       this.listLiElms[cnt].addEventListener('click', function() {
         id = this.dataset.index;
         selectedData = that.sentencesData.get(parseInt(id));
-        that.inputElms[0].value = selectedData.en;
-        that.inputElms[1].value = selectedData.slashEn;
-        that.inputElms[2].value = selectedData.jp;
-        that.inputElms[3].value = selectedData.slashJp;
-        that.inputElms[4].value = selectedData.note;
-        that.inputElms[5].value = selectedData.path;
+        that.inputElms[0].value = selectedData.slashEn;
+        that.inputElms[1].value = selectedData.jp;
+        that.inputElms[2].value = selectedData.slashJp;
+        that.inputElms[3].value = selectedData.note;
+        that.inputElms[4].value = selectedData.path;
         that.saveBtnElm.dataset.index = id;
         that.saveBtnElm.innerHTML = '上書き保存';
       });
