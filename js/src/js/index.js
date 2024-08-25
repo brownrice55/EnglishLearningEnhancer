@@ -283,11 +283,11 @@
       let slashResult = '';
       const typing = (event) => {
         let keyCode = event.key;
-
         const slashSentence = () => {
           if(len1==len1-cnt1 || currentSlashEnArray[cnt].charAt(cnt1)==keyCode) {
-            if(currentSlashEnArray[cnt].charAt(cnt1)==keyCode) {
+            if(currentSlashEnArray[cnt].charAt(cnt1)==keyCode && keyCode!='duplication') {
               ++cnt1;
+              keyCode = 'duplication';
             }
             slashResult = '<p class="main__text">' + currentSlashEnArray[cnt].substring(cnt1, len1) + '<br>';
             slashResult += currentSlashJpArray[cnt] + '</p>';
