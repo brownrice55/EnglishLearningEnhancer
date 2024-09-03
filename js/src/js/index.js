@@ -1,13 +1,22 @@
 (function() {
   'use strict';
 
+  let sentencesDataGlobal = new Map();
+  let sentencesData = localStorage.getItem('sentencesData');
+  if(sentencesData!=='undefined') {
+    const sentencesDataJson = JSON.parse(sentencesData);
+    sentencesDataGlobal = new Map(sentencesDataJson);
+  }
+  let pageDataGlobal = localStorage.getItem('pageData') || '';
+
   const Activation = function() {
     this.initialize.apply(this, arguments);
   };
 
   Activation.prototype.initialize = function() {
+    this.sentencesData = sentencesDataGlobal;
+    this.pageData = pageDataGlobal;
     this.section = document.querySelectorAll('section');
-    this.pageData = localStorage.getItem('pageData') || '';
     this.navLiElms = document.querySelectorAll('.js-nav li');
     this.settingsElm = document.querySelector('.js-settings');
   };
@@ -51,10 +60,13 @@
       that.setPageName();
       window.location.reload(false);
       speechSynthesis.cancel();
-    });
+    });  
   };
 
   Activation.prototype.run = function() {
+    if(!this.sentencesData.size) {
+      this.pageData = '';
+    }
     this.selectPage();
     this.setEvent();
   };
@@ -71,14 +83,7 @@
     this.inputElms = document.querySelectorAll('.js-input');
     this.listLiElms = document.querySelectorAll('.js-list li');
 
-    // ** 読み込みを1箇所にしたい 後で
-    this.sentencesData = new Map();
-    let sentencesData = localStorage.getItem('sentencesData');
-    if(sentencesData!=='undefined') {
-      const sentencesDataJson = JSON.parse(sentencesData);
-      this.sentencesData = new Map(sentencesDataJson);
-    }
-    // ** 読み込みを1箇所にしたい 後で
+    this.sentencesData = sentencesDataGlobal;
     this.showList();
   };
 
@@ -145,15 +150,8 @@
   };
 
   Enhancer.prototype.initialize = function() {
-    // ** 読み込みを1箇所にしたい 後で
-    this.sentencesData = new Map();
-    let sentencesData = localStorage.getItem('sentencesData');
-    if(sentencesData!=='undefined') {
-      const sentencesDataJson = JSON.parse(sentencesData);
-      this.sentencesData = new Map(sentencesDataJson);
-    }
-    this.pageData = localStorage.getItem('pageData') || '';
-    // ** 読み込みを1箇所にしたい 後で
+    this.sentencesData = sentencesDataGlobal;
+    this.pageData = pageDataGlobal;
 
     // speed reading
     this.speedreadingTextElm = document.querySelector('.js-speedreadingText');
@@ -450,8 +448,10 @@
   };
 
   Enhancer.prototype.run = function() {
-    this.showSentence();
-    this.setEvent();
+    if(this.sentencesData.size) {
+      this.showSentence();
+      this.setEvent();  
+    }
   };
 
   window.addEventListener('DOMContentLoaded', function() {
