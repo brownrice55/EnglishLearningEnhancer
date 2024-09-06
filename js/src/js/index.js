@@ -112,9 +112,10 @@
       }
     }
     let id = (aIndex=='n') ? this.sentencesData.size+1 : parseInt(aIndex);
-    let enString = this.inputElms[0].value.replace(/\//g, ' ');
+    let enSlashString = this.inputElms[0].value.replace(/\ \ /g, ' ');
+    let enString = enSlashString.replace(/\ \/\ /g, ' ');
     let enStringArray = enString.split(' ');
-    this.sentencesData.set(id, { en:enString, slashEn:aSlashEn, jp:aJp, slashJp:aSlashJp, note:aNote, path:aPath, num:enStringArray.length});
+    this.sentencesData.set(id, { en:enString, slashEn:enSlashString, jp:aJp, slashJp:aSlashJp, note:aNote, path:aPath, num:enStringArray.length});
     localStorage.setItem('sentencesData', JSON.stringify([...this.sentencesData]));
     window.location.reload(false);
   };
@@ -267,8 +268,8 @@
       let currentSlashEnArray = currentSentenceData.slashEn.split(' / ');
       let currentSlashJpArray = currentSentenceData.slashJp.split(' / ');
       let currentNoteArray = currentSentenceData.note.split(',');
-      let cnt1 = 0;
-      let len1 = currentSlashEnArray[0].length;
+      let slashSentenceCnt = 0;
+      let slashSentenceLen = currentSlashEnArray[0].length;
       // slash
 
       let isChecked = false;
@@ -282,12 +283,12 @@
       const typing = (event) => {
         let keyCode = event.key;
         const slashSentence = () => {
-          if(len1==len1-cnt1 || currentSlashEnArray[cnt].charAt(cnt1)==keyCode) {
-            if(currentSlashEnArray[cnt].charAt(cnt1)==keyCode && keyCode!='duplication') {
-              ++cnt1;
+          if(!slashSentenceCnt || currentSlashEnArray[cnt].charAt(slashSentenceCnt)==keyCode) {
+            if(currentSlashEnArray[cnt].charAt(slashSentenceCnt)==keyCode && keyCode!='duplication') {
+              ++slashSentenceCnt;
               keyCode = 'duplication';
             }
-            slashResult = '<p class="main__text">' + currentSlashEnArray[cnt].substring(cnt1, len1) + '<br>';
+            slashResult = '<p class="main__text">' + currentSlashEnArray[cnt].substring(slashSentenceCnt, slashSentenceLen) + '<br>';
             slashResult += currentSlashJpArray[cnt] + '</p>';
             note = (currentNoteArray[cnt]) ? '<p class="main__note">' + currentNoteArray[cnt] + '</p>' : '';
             that.typingTextElm.innerHTML = slashResult + note + '<p class="main__note">' + currentSentenceData.en + '<br>' + currentSentenceData.jp + '</p>';
@@ -296,36 +297,48 @@
 
         if(isChecked) {
           slashSentence();
-          if(!(len1-cnt1)){//next index
+          if(!(slashSentenceLen-slashSentenceCnt)){//next index
             ++cnt;
-            cnt1 = 0;
+            slashSentenceCnt = 0;
             if(currentSlashEnArray[cnt]) {
-              len1 = currentSlashEnArray[cnt].length;
+              slashSentenceLen = currentSlashEnArray[cnt].length;
               slashSentence();
             }
             else {
-              ++currentIndex;
+              if(this.sentenceDataArray.length==currentIndex+1) {
+                this.randomIndexArray = this.getRandomIndexArray(this.sentenceDataArray.length);
+                currentIndex = 0;
+              }
+              else {
+                ++currentIndex;
+              }
               cnt = 0;
               currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
               currentSlashEnArray = currentSentenceData.slashEn.split(' / ');
               currentSlashJpArray = currentSentenceData.slashJp.split(' / ');
               currentNoteArray = currentSentenceData.note.split(',');
-              len1 = currentSlashEnArray[cnt].length;
-              slashSentence();
+              slashSentenceLen = currentSlashEnArray[cnt].length;
+              slashSentence();  
             }
           }
         }
         else {
-          if(len==len-cnt) {
+          if(!cnt) {
             that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
           }
           if(that.sentenceDataArray[that.randomIndexArray[currentIndex]][1].en.charAt(cnt)==keyCode) {
             ++cnt;
             that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
             if(!(len-cnt)){//next
-              ++currentIndex;
-              currentSentenceData = that.sentenceDataArray[that.randomIndexArray[currentIndex]][1];
+              if(this.sentenceDataArray.length==currentIndex+1) {
+                this.randomIndexArray = this.getRandomIndexArray(this.sentenceDataArray.length);
+                currentIndex = 0;
+              }
+              else {
+                ++currentIndex;
+              }
               cnt = 0;
+              currentSentenceData = that.sentenceDataArray[that.randomIndexArray[currentIndex]][1];
               len = currentSentenceData.en.length;
               that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
             }
