@@ -183,7 +183,7 @@
     this.dictationSelectLangElm = document.querySelector('.js-dictationSelectLang');
     this.dictationSelectRateElm = document.querySelector('.js-dictationSelectRate');
     this.dictationSectionElms = document.querySelectorAll('.js-dictationSection');
-    this.dictationVideoElm = document.querySelector('.js-dictationVideo');
+    this.dictationInputElm = document.querySelector('.js-dictationInput');
     // dictation
   };
 
@@ -220,7 +220,7 @@
       this.dictationSectionElms[0].classList.remove('disp--none');
       this.dictationSectionElms[1].classList.add('disp--none');
       if(initialSentenceData.path) {
-        this.dictationVideoElm.innerHTML = '<source src="' + initialSentenceData.path + '" type="video/mp4">';
+        this.dictationSectionElms[0].innerHTML = '<video playsinline autoplay controls><source src="' + initialSentenceData.path + '" type="video/mp4"></video>';
       }
     }
   };
@@ -293,7 +293,19 @@
             note = (currentNoteArray[cnt]) ? '<p class="main__note">' + currentNoteArray[cnt] + '</p>' : '';
             that.typingTextElm.innerHTML = slashResult + note + '<p class="main__note">' + currentSentenceData.en + '<br>' + currentSentenceData.jp + '</p>';
           }
-        }
+        };
+
+        const getNextSentence = () => {
+          if(this.sentenceDataArray.length==currentIndex+1) {
+            this.randomIndexArray = this.getRandomIndexArray(this.sentenceDataArray.length);
+            currentIndex = 0;
+          }
+          else {
+            ++currentIndex;
+          }
+          cnt = 0;
+          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[currentIndex]][1];
+        };
 
         if(isChecked) {
           slashSentence();
@@ -305,15 +317,7 @@
               slashSentence();
             }
             else {
-              if(this.sentenceDataArray.length==currentIndex+1) {
-                this.randomIndexArray = this.getRandomIndexArray(this.sentenceDataArray.length);
-                currentIndex = 0;
-              }
-              else {
-                ++currentIndex;
-              }
-              cnt = 0;
-              currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
+              getNextSentence();
               currentSlashEnArray = currentSentenceData.slashEn.split(' / ');
               currentSlashJpArray = currentSentenceData.slashJp.split(' / ');
               currentNoteArray = currentSentenceData.note.split(',');
@@ -330,15 +334,7 @@
             ++cnt;
             that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
             if(!(len-cnt)){//next
-              if(this.sentenceDataArray.length==currentIndex+1) {
-                this.randomIndexArray = this.getRandomIndexArray(this.sentenceDataArray.length);
-                currentIndex = 0;
-              }
-              else {
-                ++currentIndex;
-              }
-              cnt = 0;
-              currentSentenceData = that.sentenceDataArray[that.randomIndexArray[currentIndex]][1];
+              getNextSentence();
               len = currentSentenceData.en.length;
               that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
             }
@@ -426,22 +422,19 @@
 
       this.dictationResultBtnElm.addEventListener('click', function() {
         if(cnt%2) {
-          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[cnt]][1];
+          if(that.sentenceDataArray.length*2==cnt+1) {
+            that.randomIndexArray = that.getRandomIndexArray(that.sentenceDataArray.length);
+            cnt = -1;
+          }
+          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((cnt+1)/2)]][1];
           this.innerHTML = '確認';
           div.remove();
           isInitial = true;
           speechSynthesis.cancel();
           that.dictationBtnElm.innerHTML = '音声スタート';
           if(currentSentenceData.path) {
-            that.dictationVideoElm.innerHTML = '<source src="' + currentSentenceData.path + '" type="video/mp4">';
-            if(that.dictationAudioType=='path') {
-              that.dictationSectionElms[0].classList.remove('disp--none');
-              that.dictationSectionElms[1].classList.add('disp--none');
-            }
-            else {
-              that.dictationSectionElms[0].classList.add('disp--none');
-              that.dictationSectionElms[1].classList.remove('disp--none');
-            }
+            that.dictationInputElm.value = '';
+            that.dictationSectionElms[0].innerHTML = '<video playsinline controls><source src="' + currentSentenceData.path + '" type="video/mp4"></video>';
             dictationNavElms[0].parentNode.classList.remove('disp--none');
           }
           else {
