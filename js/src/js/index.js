@@ -94,6 +94,7 @@
 
   DataManagement.prototype.initialize = function() {
     this.saveBtnElm = document.querySelector('.js-save');
+    this.cancelBtnElm = document.querySelector('.js-cancel');
     this.listElm = document.querySelector('.js-list');
     this.listTitleElm = document.querySelector('.js-listTitle');
     this.listTitleSpanElm = this.listTitleElm.querySelector('span');
@@ -148,6 +149,16 @@
     this.saveBtnElm.addEventListener('click', function() {
       that.saveData(this.dataset.index, that.inputElms[0].value, that.inputElms[1].value, that.inputElms[2].value, that.inputElms[3].value, that.inputElms[4].value);
     });
+    this.cancelBtnElm.addEventListener('click', function() {
+      that.inputElms[0].value = '';
+      that.inputElms[1].value = '';
+      that.inputElms[2].value = '';
+      that.inputElms[3].value = '';
+      that.inputElms[4].value = '';
+      that.registrationContElms[0].classList.add('disp--none');
+      that.registrationContElms[1].classList.remove('disp--none');
+      this.classList.add('disp--none');
+    })
     let id = 0;
     let selectedData = new Map();
     for(let cnt=0,len=this.listLiElms.length;cnt<len;++cnt) {
@@ -162,6 +173,7 @@
         that.inputElms[4].value = selectedData.path;
         that.saveBtnElm.dataset.index = id;
         that.saveBtnElm.innerHTML = '上書き保存';
+        that.cancelBtnElm.classList.remove('disp--none');
         that.registrationContElms[0].classList.remove('disp--none');
         that.registrationContElms[1].classList.add('disp--none');
       });
