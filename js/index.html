@@ -18,40 +18,49 @@
         </ul>
       </nav>
       <nav class="header__settingBtn">
-        <button class="js-settings">設定</button>
+        <ul class="js-settings">
+          <li>登録</li>
+          <li>設定</li>
+        </ul>
       </nav>
     </div>
   </header>
   <main class="main">
     <h1>英語力強化アプリ</h1>
-    <section class="js-registration">
-      <h2>新規登録</h2>
-      <div>
-        <h3>英文（スラッシュ付き）<span class="required">※</span><br>
-        <small>※「 / 」で区切ってください。</small></h3>
-        <textarea class="js-input"></textarea>
+    <section class="js-registration registration">
+      <ul class="js-registrationTab registration__tab">
+        <li class="active">新規登録</li>
+        <li>一覧（編集・削除）</li>
+      </ul>
+      <div class="js-registrationCont">
+        <h2>新規登録</h2>
+        <div>
+          <h3>英文（スラッシュ付き）<span class="required">※</span><br>
+          <small>※「 / 」で区切ってください。</small></h3>
+          <textarea class="js-input"></textarea>
+        </div>
+        <div>
+          <h3>日本語訳<span class="required">※</span></h3>
+          <textarea class="js-input"></textarea>
+        </div>
+        <div>
+          <h3>スラッシュ訳<span class="required">※</span><br>
+          <small>※「 / 」で区切ってください。スラッシュ付き英文と対応する位置に日本語訳を入力してください</small></h3>
+          <textarea class="js-input"></textarea>
+        </div>
+        <div>
+          <h3>備考（ヒント）<br><small>※スラッシュ付き写経で同じタイミングでヒントを出したい場合は「,」で区切って、スラッシュ付き英文と対応する位置にヒントを入力ください</small></h3>
+          <textarea class="js-input"></textarea>
+        </div>
+        <div>
+          <h3>音声パス</h3>
+          <input type="text" class="js-input">
+        </div>
+        <div class="registration__save">
+          <button class="js-save" data-index="n">保存</button>
+        </div>
       </div>
-      <div>
-        <h3>日本語訳<span class="required">※</span></h3>
-        <textarea class="js-input"></textarea>
-      </div>
-      <div>
-        <h3>スラッシュ訳<span class="required">※</span><br>
-        <small>※「 / 」で区切ってください。スラッシュ付き英文と対応する位置に日本語訳を入力してください</small></h3>
-        <textarea class="js-input"></textarea>
-      </div>
-      <div>
-        <h3>備考（ヒント）<br><small>※スラッシュ付き写経で同じタイミングでヒントを出したい場合は「,」で区切って、スラッシュ付き英文と対応する位置にヒントを入力ください</small></h3>
-        <textarea class="js-input"></textarea>
-      </div>
-      <div>
-        <h3>音声パス</h3>
-        <input type="text" class="js-input">
-      </div>
-      <div>
-        <button class="js-save" data-index="n">保存</button>
-      </div>
-      <div class="main__list">
+      <div class="js-registrationCont main__list">
         <h3 class="main__list__title js-listTitle">登録済み<span class="main__list__number"></span></h3>
         <ul class="js-list"></ul>
       </div>

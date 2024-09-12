@@ -8,6 +8,12 @@
     sentencesDataGlobal = new Map(sentencesDataJson);
   }
   let pageDataGlobal = localStorage.getItem('pageData') || '';
+  let registrationTabDataGlobal = localStorage.getItem('registrationTabData') || 'new';
+  const registrationContIndexArray = [[1,0],[0,1]];
+
+  const registrationTabElmGlobal = document.querySelector('.js-registrationTab');
+  const registrationTabLiElmsGlobal = registrationTabElmGlobal.querySelectorAll('li');
+  const registrationContElmsGlobal = document.querySelectorAll('.js-registrationCont');
 
   const Activation = function() {
     this.initialize.apply(this, arguments);
@@ -18,7 +24,14 @@
     this.pageData = pageDataGlobal;
     this.section = document.querySelectorAll('section');
     this.navLiElms = document.querySelectorAll('.js-nav li');
-    this.settingsElm = document.querySelector('.js-settings');
+    this.settingsLiElms = document.querySelectorAll('.js-settings li');
+    this.registrationBtnElm = this.settingsLiElms[0];
+    this.settingsBtnElm = this.settingsLiElms[1];
+    this.registrationElm = document.querySelector('.js-registration');
+    this.registrationTabElm = registrationTabElmGlobal;
+    this.registrationTabLiElms = registrationTabLiElmsGlobal;
+    this.registrationContElms = registrationContElmsGlobal;
+    this.registrationTabData = registrationTabDataGlobal;
   };
 
   Activation.prototype.selectPage = function() {
@@ -31,13 +44,17 @@
         if(this.pageData==pageNameArray[cnt]) {
           let pageElms = document.querySelector('.js-' + pageNameArray[cnt]);
           pageElms.classList.remove('disp--none');  
-        }  
+        }
       }
     }
     else { //initial
-      let initialPageElm = document.querySelector('.js-registration');
-      initialPageElm.classList.remove('disp--none');
+      this.registrationElm.classList.remove('disp--none');
     }
+    let cnt = (this.registrationTabData=='new') ? 0 : 1;
+    this.registrationContElms[registrationContIndexArray[cnt][0]].classList.add('disp--none');
+    this.registrationContElms[registrationContIndexArray[cnt][1]].classList.remove('disp--none');
+    this.registrationTabLiElms[registrationContIndexArray[cnt][1]].classList.add('active');
+    this.registrationTabLiElms[registrationContIndexArray[cnt][0]].classList.remove('active');
   };
 
   Activation.prototype.setPageName = function() {
@@ -55,12 +72,12 @@
         speechSynthesis.cancel();
       });
     }
-    this.settingsElm.addEventListener('click', function() {
+    this.registrationBtnElm.addEventListener('click', function() {
       that.pageData = '';
       that.setPageName();
       window.location.reload(false);
       speechSynthesis.cancel();
-    });  
+    });
   };
 
   Activation.prototype.run = function() {
@@ -85,6 +102,11 @@
 
     this.sentencesData = sentencesDataGlobal;
     this.showList();
+
+    this.registrationTabElm = registrationTabElmGlobal;
+    this.registrationTabLiElms = registrationTabLiElmsGlobal;
+    this.registrationContElms = registrationContElmsGlobal;
+    this.registrationTabData = registrationTabDataGlobal;
   };
 
   DataManagement.prototype.showList = function() {
@@ -117,6 +139,7 @@
     let enStringArray = enString.split(' ');
     this.sentencesData.set(id, { en:enString, slashEn:enSlashString, jp:aJp, slashJp:aSlashJp, note:aNote, path:aPath, num:enStringArray.length});
     localStorage.setItem('sentencesData', JSON.stringify([...this.sentencesData]));
+    localStorage.setItem('registrationTabData', this.registrationTabData);
     window.location.reload(false);
   };
 
@@ -129,6 +152,7 @@
     let selectedData = new Map();
     for(let cnt=0,len=this.listLiElms.length;cnt<len;++cnt) {
       this.listLiElms[cnt].addEventListener('click', function() {
+        that.registrationTabData = 'edit';
         id = this.dataset.index;
         selectedData = that.sentencesData.get(parseInt(id));
         that.inputElms[0].value = selectedData.slashEn;
@@ -138,6 +162,25 @@
         that.inputElms[4].value = selectedData.path;
         that.saveBtnElm.dataset.index = id;
         that.saveBtnElm.innerHTML = '上書き保存';
+        that.registrationContElms[0].classList.remove('disp--none');
+        that.registrationContElms[1].classList.add('disp--none');
+      });
+    }
+    for(let cnt=0,len=this.registrationTabLiElms.length;cnt<len;++cnt) {
+      this.registrationTabLiElms[cnt].addEventListener('click', function() {
+        that.registrationContElms[registrationContIndexArray[cnt][0]].classList.add('disp--none');
+        that.registrationContElms[registrationContIndexArray[cnt][1]].classList.remove('disp--none');
+        that.registrationTabLiElms[registrationContIndexArray[cnt][1]].classList.add('active');
+        that.registrationTabLiElms[registrationContIndexArray[cnt][0]].classList.remove('active');
+        that.registrationTabData = (cnt) ? 'edit' : 'new';
+        localStorage.setItem('registrationTabData', that.registrationTabData);
+        if(that.registrationTabData=='new') {
+          that.inputElms[0].value = '';
+          that.inputElms[1].value = '';
+          that.inputElms[2].value = '';
+          that.inputElms[3].value = '';
+          that.inputElms[4].value = '';
+        }
       });
     }
   };

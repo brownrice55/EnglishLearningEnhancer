@@ -3,6 +3,7 @@
 
 $colorRed: #c00;
 $colorGray: #ccc;
+$colorDarkGray: #666;
 $colorLightGray: #f0f0f0;
 
 @function rem($px) {
@@ -38,12 +39,40 @@ $colorLightGray: #f0f0f0;
     position: absolute;
     top: 4px;
     right: 8px;
+    li {
+      display: inline-block;
+      cursor: pointer;
+    }
   }
 }
 .main {
   margin: 0 auto;
   padding-top: 80px;
   text-align: center;
+  .registration {
+    padding-bottom: 70px;
+    &__tab {
+      li {
+        display: inline-block;
+        background: $colorGray;
+        padding: 16px 24px;
+        margin: 8px 0 24px;
+        cursor: pointer;
+        &.active {
+          background: $colorDarkGray;
+          color: #fff;
+          cursor: default;
+        }
+      }
+    }
+    &__save {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      z-index: 10;
+      width: 100%;
+    }
+  }
   &__list {
     padding: 40px 16px;
     text-align: left;
