@@ -431,10 +431,14 @@
             if(that.dictationAudioType=='path') {
               that.dictationSectionElms[0].classList.remove('disp--none');
               that.dictationSectionElms[1].classList.add('disp--none');
+              dictationNavElms[0].classList.add('active');
+              dictationNavElms[1].classList.remove('active');
             }
             else {
               that.dictationSectionElms[0].classList.add('disp--none');
               that.dictationSectionElms[1].classList.remove('disp--none');
+              dictationNavElms[0].classList.remove('active');
+              dictationNavElms[1].classList.add('active');
             }
           });
         }
