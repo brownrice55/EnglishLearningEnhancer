@@ -110,33 +110,28 @@
     this.registrationTabData = registrationTabDataGlobal;
   };
 
-  DataManagement.prototype.addList = function(aType, aElm) {
-    let listData = '';
-    let cnt = 0;
+  DataManagement.prototype.getListData = function() {
+    this.listDataRegister = '';
+    this.listDataSettingsInitial = '';
+    this.listDataSettingsClear = '';
+    this.registerCnt = 0;
     let checked = '';
     this.sentencesData.forEach((value, key) => {
-      if(aType=='register') {
-        listData += '<li data-index="' + key + '">' + value.en + '</li>';
-        ++cnt;  
-      }
-      else  {
-        if(aType=='settingsInitial') {
-          checked = (value.isChecked) ? ' checked' : '';
-        }
-        listData += '<li data-index="' + key + '"><label><input type="checkbox"' + checked + '> ' + value.en + '</label></li>';
-      }
+      this.listDataRegister += '<li data-index="' + key + '">' + value.en + '</li>';
+      ++this.registerCnt;  
+      checked = (value.isChecked) ? ' checked' : '';
+      this.listDataSettingsInitial += '<li data-index="' + key + '"><label><input type="checkbox"' + checked + '> ' + value.en + '</label></li>';
+      this.listDataSettingsClear += '<li data-index="' + key + '"><label><input type="checkbox"> ' + value.en + '</label></li>';
     });
-    aElm.innerHTML = listData;
-    if(aType=='register') {
-      this.listTitleSpanElm.innerHTML = cnt + '件';
-    }
   };
 
   DataManagement.prototype.showList = function() {
-    this.addList('register', this.listElm);
+    this.getListData();
+    this.listElm.innerHTML = this.listDataRegister;
+    this.listTitleSpanElm.innerHTML = this.registerCnt + '件';
     this.listLiElms = document.querySelectorAll('.js-list li');
 
-    this.addList('settingsInitial', this.settingsListElm);
+    this.settingsListElm.innerHTML = this.listDataSettingsInitial;
     this.settingsListInputElms = document.querySelectorAll('.js-settingsList input');
   };
 
@@ -216,7 +211,7 @@
     }
     // clear btn
     this.settingsBtnElms[0].addEventListener('click', function() {
-      that.addList('settingsClear', that.settingsListElm);
+      that.settingsListElm.innerHTML = that.listDataSettingsClear;
       that.settingsListInputElms = document.querySelectorAll('.js-settingsList input');
 
       let sentencesData = new Map();
