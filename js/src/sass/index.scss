@@ -88,6 +88,10 @@ $borderRadius : 4px;
     li {
       cursor: pointer;
       padding: 10px 0;
+      label {
+        display: block;
+        cursor: pointer;
+      }
     }
   }
   textarea {

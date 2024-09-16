@@ -37,7 +37,7 @@
       this.section[cnt].classList.add('disp--none');
     }
     if(this.sentencesData.size) {
-      this.pageData = (this.pageData) ? this.pageData : 'speedreading';
+      this.pageData = (this.pageData) ? this.pageData : 'registration';
       const pageNameArray = ['speedreading', 'typing', 'writing', 'dictation', 'registration', 'settings'];
       for(let cnt=0,len=pageNameArray.length;cnt<len;++cnt) {
         if(this.pageData==pageNameArray[cnt]) {
@@ -96,10 +96,13 @@
     this.listTitleElm = document.querySelector('.js-listTitle');
     this.listTitleSpanElm = this.listTitleElm.querySelector('span');
     this.inputElms = document.querySelectorAll('.js-input');
-    this.listLiElms = document.querySelectorAll('.js-list li');
+    this.settingsListElm = document.querySelector('.js-settingsList');
+    this.settingsBtnElms = document.querySelectorAll('.js-settingsBtn button');
 
     this.sentencesData = sentencesDataGlobal;
-    this.showList();
+    if(this.sentencesData.size) {
+      this.showList();
+    }
 
     this.registrationTabElm = registrationTabElmGlobal;
     this.registrationTabLiElms = registrationTabLiElmsGlobal;
@@ -107,25 +110,37 @@
     this.registrationTabData = registrationTabDataGlobal;
   };
 
-  DataManagement.prototype.showList = function() {
-    if(this.sentencesData.size) {
-      this.listTitleElm.classList.remove('disp--none');
-    }
-    else {
-      this.listTitleElm.classList.add('disp--none');
-    }
-    let showList = '';
+  DataManagement.prototype.addList = function(aType, aElm) {
+    let listData = '';
     let cnt = 0;
+    let checked = '';
     this.sentencesData.forEach((value, key) => {
-      showList += '<li data-index="' + key + '">' + value.en + '</li>';
-      ++cnt;
+      if(aType=='register') {
+        listData += '<li data-index="' + key + '">' + value.en + '</li>';
+        ++cnt;  
+      }
+      else  {
+        if(aType=='settingsInitial') {
+          checked = (value.isChecked) ? ' checked' : '';
+        }
+        listData += '<li data-index="' + key + '"><label><input type="checkbox"' + checked + '> ' + value.en + '</label></li>';
+      }
     });
-    this.listElm.innerHTML = showList;
-    this.listTitleSpanElm.innerHTML = cnt + '件';
-    this.listLiElms = document.querySelectorAll('.js-list li');
+    aElm.innerHTML = listData;
+    if(aType=='register') {
+      this.listTitleSpanElm.innerHTML = cnt + '件';
+    }
   };
 
-  DataManagement.prototype.saveData = function(aIndex, aSlashEn, aJp, aSlashJp, aNote, aPath) {
+  DataManagement.prototype.showList = function() {
+    this.addList('register', this.listElm);
+    this.listLiElms = document.querySelectorAll('.js-list li');
+
+    this.addList('settingsInitial', this.settingsListElm);
+    this.settingsListInputElms = document.querySelectorAll('.js-settingsList input');
+  };
+
+  DataManagement.prototype.saveData = function(aIndex, aSlashEn, aJp, aSlashJp, aNote, aPath, aIsChecked) {
     for(let cnt=0,len=this.inputElms.length-2;cnt<len;++cnt) {
       if(!this.inputElms[cnt].value) {
         return;
@@ -135,7 +150,7 @@
     let enSlashString = this.inputElms[0].value.replace(/\ \ /g, ' ');
     let enString = enSlashString.replace(/\ \/\ /g, ' ');
     let enStringArray = enString.split(' ');
-    this.sentencesData.set(id, { en:enString, slashEn:enSlashString, jp:aJp, slashJp:aSlashJp, note:aNote, path:aPath, num:enStringArray.length});
+    this.sentencesData.set(id, { en:enString, slashEn:enSlashString, jp:aJp, slashJp:aSlashJp, note:aNote, path:aPath, num:enStringArray.length, isChecked:aIsChecked});
     localStorage.setItem('sentencesData', JSON.stringify([...this.sentencesData]));
     localStorage.setItem('registrationTabData', this.registrationTabData);
     window.location.reload(false);
@@ -152,8 +167,11 @@
   DataManagement.prototype.setEvent = function() {
     let that = this;
     this.saveBtnElm.addEventListener('click', function() {
-      that.saveData(this.dataset.index, that.inputElms[0].value, that.inputElms[1].value, that.inputElms[2].value, that.inputElms[3].value, that.inputElms[4].value);
+      that.saveData(this.dataset.index, that.inputElms[0].value, that.inputElms[1].value, that.inputElms[2].value, that.inputElms[3].value, that.inputElms[4].value, false);
     });
+    if(!this.sentencesData.size) {
+      return;
+    }
     this.cancelBtnElm.addEventListener('click', function() {
       that.setInputElms('','','','','');
       that.registrationContElms[0].classList.add('disp--none');
@@ -188,6 +206,29 @@
         }
       });
     }
+    for(let cnt=0,len=this.settingsListInputElms.length;cnt<len;++cnt) {
+      this.settingsListInputElms[cnt].addEventListener('click', function() {
+        that.settingsBtnElms[0].parentNode.classList.remove('disp--none');
+        id = this.parentNode.parentNode.dataset.index;
+        selectedData = that.sentencesData.get(parseInt(id));
+        that.sentencesData.set(parseInt(id), { en:selectedData.en, slashEn:selectedData.slashEn, jp:selectedData.jp, slashJp:selectedData.slashJp, note:selectedData.note, path:selectedData.path, num:selectedData.num, isChecked:this.checked});
+      });
+    }
+    // clear btn
+    this.settingsBtnElms[0].addEventListener('click', function() {
+      that.addList('settingsClear', that.settingsListElm);
+      that.settingsListInputElms = document.querySelectorAll('.js-settingsList input');
+
+      let sentencesData = new Map();
+      that.sentencesData.forEach((value, key) => {
+        sentencesData.set(key, { en:value.en, slashEn:value.slashEn, jp:value.jp, slashJp:value.slashJp, note:value.note, path:value.path, num:value.num, isChecked:false});
+      });
+      that.sentencesData = sentencesData;
+    });
+    // settings btn
+    this.settingsBtnElms[1].addEventListener('click', function() {
+      localStorage.setItem('sentencesData', JSON.stringify([...that.sentencesData]));
+    });
   };
 
   DataManagement.prototype.run = function() {

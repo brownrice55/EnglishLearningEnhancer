@@ -43,6 +43,8 @@ Could you please let me know if there are any errors in my English or code?</p>
 <li>保管するデータに名前をつけて複数保管できるようにするか検討。</li>
 <li>自動音声の動きが変なので見直す</li>
 <li>登録のページの削除について、どのように設置するか検討。</li>
+<li>文章を保存する時のisCheckedをどうするか検討。</li>
+<li>設定のボタンの扱いを検討。</li>
 </ul>
 
 ### メモ-実装・対応済み
