@@ -23,10 +23,8 @@
     this.sentencesData = sentencesDataGlobal;
     this.pageData = pageDataGlobal;
     this.section = document.querySelectorAll('section');
+    this.headerElm = document.querySelector('.js-header');
     this.navLiElms = document.querySelectorAll('.js-nav li');
-    this.settingsLiElms = document.querySelectorAll('.js-settings li');
-    this.registrationBtnElm = this.settingsLiElms[0];
-    this.settingsBtnElm = this.settingsLiElms[1];
     this.registrationElm = document.querySelector('.js-registration');
     this.registrationTabElm = registrationTabElmGlobal;
     this.registrationTabLiElms = registrationTabLiElmsGlobal;
@@ -38,23 +36,28 @@
     for(let cnt=0,len=this.section.length;cnt<len;++cnt) {
       this.section[cnt].classList.add('disp--none');
     }
-    if(this.pageData) {
-      const pageNameArray = ['speedreading', 'typing', 'writing', 'dictation'];
+    if(this.sentencesData.size) {
+      this.pageData = (this.pageData) ? this.pageData : 'speedreading';
+      const pageNameArray = ['speedreading', 'typing', 'writing', 'dictation', 'registration', 'settings'];
       for(let cnt=0,len=pageNameArray.length;cnt<len;++cnt) {
         if(this.pageData==pageNameArray[cnt]) {
           let pageElms = document.querySelector('.js-' + pageNameArray[cnt]);
           pageElms.classList.remove('disp--none');  
         }
       }
+      let cnt = (this.registrationTabData=='new') ? 0 : 1;
+      this.registrationContElms[registrationContIndexArray[cnt][0]].classList.add('disp--none');
+      this.registrationContElms[registrationContIndexArray[cnt][1]].classList.remove('disp--none');
+      this.registrationTabLiElms[registrationContIndexArray[cnt][1]].classList.add('active');
+      this.registrationTabLiElms[registrationContIndexArray[cnt][0]].classList.remove('active');
     }
     else { //initial
       this.registrationElm.classList.remove('disp--none');
+      this.headerElm.classList.add('disp--none');
+      this.registrationContElms[0].classList.remove('disp--none');
+      this.registrationContElms[1].classList.add('disp--none');
+      this.registrationTabElm.classList.add('disp--none');  
     }
-    let cnt = (this.registrationTabData=='new') ? 0 : 1;
-    this.registrationContElms[registrationContIndexArray[cnt][0]].classList.add('disp--none');
-    this.registrationContElms[registrationContIndexArray[cnt][1]].classList.remove('disp--none');
-    this.registrationTabLiElms[registrationContIndexArray[cnt][1]].classList.add('active');
-    this.registrationTabLiElms[registrationContIndexArray[cnt][0]].classList.remove('active');
   };
 
   Activation.prototype.setPageName = function() {
@@ -72,12 +75,6 @@
         speechSynthesis.cancel();
       });
     }
-    this.registrationBtnElm.addEventListener('click', function() {
-      that.pageData = '';
-      that.setPageName();
-      window.location.reload(false);
-      speechSynthesis.cancel();
-    });
   };
 
   Activation.prototype.run = function() {
@@ -144,17 +141,21 @@
     window.location.reload(false);
   };
 
+  DataManagement.prototype.setInputElms = function(aInput0, aInput1, aInput2, aInput3, aInput4) {
+    this.inputElms[0].value = aInput0;
+    this.inputElms[1].value = aInput1;
+    this.inputElms[2].value = aInput2;
+    this.inputElms[3].value = aInput3;
+    this.inputElms[4].value = aInput4;
+  };
+
   DataManagement.prototype.setEvent = function() {
     let that = this;
     this.saveBtnElm.addEventListener('click', function() {
       that.saveData(this.dataset.index, that.inputElms[0].value, that.inputElms[1].value, that.inputElms[2].value, that.inputElms[3].value, that.inputElms[4].value);
     });
     this.cancelBtnElm.addEventListener('click', function() {
-      that.inputElms[0].value = '';
-      that.inputElms[1].value = '';
-      that.inputElms[2].value = '';
-      that.inputElms[3].value = '';
-      that.inputElms[4].value = '';
+      that.setInputElms('','','','','');
       that.registrationContElms[0].classList.add('disp--none');
       that.registrationContElms[1].classList.remove('disp--none');
       this.classList.add('disp--none');
@@ -166,11 +167,7 @@
         that.registrationTabData = 'edit';
         id = this.dataset.index;
         selectedData = that.sentencesData.get(parseInt(id));
-        that.inputElms[0].value = selectedData.slashEn;
-        that.inputElms[1].value = selectedData.jp;
-        that.inputElms[2].value = selectedData.slashJp;
-        that.inputElms[3].value = selectedData.note;
-        that.inputElms[4].value = selectedData.path;
+        that.setInputElms(selectedData.slashEn, selectedData.jp, selectedData.slashJp, selectedData.note, selectedData.path);
         that.saveBtnElm.dataset.index = id;
         that.saveBtnElm.innerHTML = '上書き保存';
         that.cancelBtnElm.classList.remove('disp--none');
@@ -187,11 +184,7 @@
         that.registrationTabData = (cnt) ? 'edit' : 'new';
         localStorage.setItem('registrationTabData', that.registrationTabData);
         if(that.registrationTabData=='new') {
-          that.inputElms[0].value = '';
-          that.inputElms[1].value = '';
-          that.inputElms[2].value = '';
-          that.inputElms[3].value = '';
-          that.inputElms[4].value = '';
+          that.setInputElms('','','','','');
         }
       });
     }
@@ -239,6 +232,7 @@
     this.dictationSelectRateElm = document.querySelector('.js-dictationSelectRate');
     this.dictationSectionElms = document.querySelectorAll('.js-dictationSection');
     this.dictationInputElm = document.querySelector('.js-dictationInput');
+    this.dictationNavElms = document.querySelectorAll('.js-dictationNav li');
     // dictation
   };
 
@@ -274,6 +268,8 @@
       this.dictationAudioType = 'path';
       this.dictationSectionElms[0].classList.remove('disp--none');
       this.dictationSectionElms[1].classList.add('disp--none');
+      this.dictationNavElms[0].classList.add('active');
+      this.dictationNavElms[1].classList.remove('active');
       if(initialSentenceData.path) {
         this.dictationSectionElms[0].innerHTML = '<video playsinline autoplay controls><source src="' + initialSentenceData.path + '" type="video/mp4"></video>';
       }
@@ -423,30 +419,20 @@
     }
     else if(this.pageData=='dictation') {
       currentSentenceData = this.sentenceDataArray[this.randomIndexArray[0]][1];
-      let dictationNavElms = document.querySelectorAll('.js-dictationNav li');
-      if(currentSentenceData.path) {
-        for(let cnt=0;cnt<2;++cnt) {
-          dictationNavElms[cnt].addEventListener('click', function() {
-            that.dictationAudioType = event.target.dataset.type;
-            if(that.dictationAudioType=='path') {
-              that.dictationSectionElms[0].classList.remove('disp--none');
-              that.dictationSectionElms[1].classList.add('disp--none');
-              dictationNavElms[0].classList.add('active');
-              dictationNavElms[1].classList.remove('active');
-            }
-            else {
-              that.dictationSectionElms[0].classList.add('disp--none');
-              that.dictationSectionElms[1].classList.remove('disp--none');
-              dictationNavElms[0].classList.remove('active');
-              dictationNavElms[1].classList.add('active');
-            }
-          });
-        }
+      for(let cnt=0;cnt<2;++cnt) {
+        this.dictationNavElms[cnt].addEventListener('click', function() {
+          that.dictationAudioType = event.target.dataset.type;
+          const dictationAudioTypeIndexArray = (that.dictationAudioType=='path') ? [0,1] : [1,0];
+          that.dictationSectionElms[dictationAudioTypeIndexArray[0]].classList.remove('disp--none');
+          that.dictationSectionElms[dictationAudioTypeIndexArray[1]].classList.add('disp--none');
+          that.dictationNavElms[dictationAudioTypeIndexArray[0]].classList.add('active');
+          that.dictationNavElms[dictationAudioTypeIndexArray[1]].classList.remove('active');
+        });
       }
-      else { //pathがない時はナビを表示しない
+      if(!currentSentenceData.path) { //pathがない時はナビを表示しない
         this.dictationSectionElms[0].classList.add('disp--none');
         this.dictationSectionElms[1].classList.remove('disp--none');
-        dictationNavElms[0].parentNode.classList.add('disp--none');
+        this.dictationNavElms[0].parentNode.classList.add('disp--none');
       }
 
       let isPlaying = false;
@@ -494,12 +480,16 @@
           if(currentSentenceData.path) {
             that.dictationInputElm.value = '';
             that.dictationSectionElms[0].innerHTML = '<video playsinline controls><source src="' + currentSentenceData.path + '" type="video/mp4"></video>';
-            dictationNavElms[0].parentNode.classList.remove('disp--none');
+            that.dictationNavElms[0].parentNode.classList.remove('disp--none');
+            that.dictationNavElms[0].classList.add('active');
+            that.dictationNavElms[1].classList.remove('active');
+            that.dictationSectionElms[0].classList.remove('disp--none');
+            that.dictationSectionElms[1].classList.add('disp--none');
           }
           else {
             that.dictationSectionElms[0].classList.add('disp--none');
             that.dictationSectionElms[1].classList.remove('disp--none');
-            dictationNavElms[0].parentNode.classList.add('disp--none');
+            that.dictationNavElms[0].parentNode.classList.add('disp--none');
           }
         }
         else {

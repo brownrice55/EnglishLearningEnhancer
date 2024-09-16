@@ -7,7 +7,7 @@
   <title>英語力強化アプリ</title>
 </head>
 <body>
-  <header class="header">
+  <header class="header js-header">
     <div>
       <nav class="header__nav">
         <ul class="js-nav">
@@ -18,9 +18,9 @@
         </ul>
       </nav>
       <nav class="header__settingBtn">
-        <ul class="js-settings">
-          <li>登録</li>
-          <li>設定</li>
+        <ul class="js-nav">
+          <li data-page="registration">登録</li>
+          <li data-page="settings">設定</li>
         </ul>
       </nav>
     </div>
@@ -65,6 +65,9 @@
         <h3 class="main__list__title js-listTitle">登録済み<span class="main__list__number"></span></h3>
         <ul class="js-list"></ul>
       </div>
+    </section>
+    <section class="js-settings">
+      <h2>設定</h2>
     </section>
     <section class="js-speedreading">
       <h2>速読</h2>
