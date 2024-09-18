@@ -43,8 +43,8 @@ Could you please let me know if there are any errors in my English or code?</p>
 <li>保管するデータに名前をつけて複数保管できるようにするか検討。</li>
 <li>自動音声の動きが変なので見直す</li>
 <li>登録のページの削除について、どのように設置するか検討。</li>
-<li>文章を保存する時のisCheckedをどうするか検討。</li>
 <li>設定のボタンの扱いを検討。</li>
+<li>「全ての問題」を選択した時に、「もう一度練習する」ボタンを追加するか検討（速読にだけつけても良いかも？）。</li>
 </ul>
 
 ### メモ-実装・対応済み
@@ -53,6 +53,7 @@ Could you please let me know if there are any errors in my English or code?</p>
 <li><s>パス名の保管は任意。音声データのパスがない場合は自動音声を使う。</s></li>
 <li><s>写経はスラッシュ区切りのタイピングもできるようにする。</s></li>
 <li><s>設定のページを見やすくする。</s></li>
+<li><s>文章を保存する時のisCheckedをどうするか検討。</s></li>
 </ul>
 
 ## 参考

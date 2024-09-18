@@ -2,11 +2,24 @@
   'use strict';
 
   let sentencesDataGlobal = new Map();
+  let sentencesDataAllGlobal = new Map();
+  let sentencesDataCheckedGlobal = new Map();
   let sentencesData = localStorage.getItem('sentencesData');
+  let allOrCheckedData = localStorage.getItem('allOrCheckedData') || 'all';
+
   if(sentencesData!=='undefined') {
     const sentencesDataJson = JSON.parse(sentencesData);
-    sentencesDataGlobal = new Map(sentencesDataJson);
+    sentencesDataAllGlobal = new Map(sentencesDataJson);
+    let sentencesDataCheckedGlobalIdCnt = 0;
+    sentencesDataAllGlobal.forEach((value, key) => {
+      ++sentencesDataCheckedGlobalIdCnt;
+      if(value.isChecked) {
+        sentencesDataCheckedGlobal.set(sentencesDataCheckedGlobalIdCnt, { en:value.en, slashEn:value.slashEn, jp:value.jp, slashJp:value.slashJp, note:value.note, path:value.path, num:value.num, isChecked:value.isChecked});
+      }
+    });
+    sentencesDataGlobal = (sentencesDataCheckedGlobal.size && (allOrCheckedData=='checked')) ? sentencesDataCheckedGlobal : sentencesDataAllGlobal;
   }
+
   let pageDataGlobal = localStorage.getItem('pageData') || '';
   let registrationTabDataGlobal = localStorage.getItem('registrationTabData') || 'new';
   const registrationContIndexArray = [[1,0],[0,1]];
@@ -15,6 +28,24 @@
   const registrationTabLiElmsGlobal = registrationTabElmGlobal.querySelectorAll('li');
   const registrationContElmsGlobal = document.querySelectorAll('.js-registrationCont');
 
+  const selectPage = (aPageData) => {
+    const section = document.querySelectorAll('section');
+    const selectSentences = document.querySelector('.js-selectSentences');
+    for(let cnt=0,len=section.length;cnt<len;++cnt) {
+      section[cnt].classList.add('disp--none');
+    }
+    const pageNameArray = ['speedreading', 'typing', 'writing', 'dictation', 'registration', 'settings'];
+    for(let cnt=0,len=pageNameArray.length;cnt<len;++cnt) {
+      if(aPageData==pageNameArray[cnt]) {
+        let pageElms = document.querySelector('.js-' + pageNameArray[cnt]);
+        pageElms.classList.remove('disp--none');  
+      }
+    }
+    if(aPageData=='registration' || aPageData=='settings') {
+      selectSentences.parentNode.classList.add('disp--none');
+    }
+  };
+
   const Activation = function() {
     this.initialize.apply(this, arguments);
   };
@@ -22,7 +53,6 @@
   Activation.prototype.initialize = function() {
     this.sentencesData = sentencesDataGlobal;
     this.pageData = pageDataGlobal;
-    this.section = document.querySelectorAll('section');
     this.headerElm = document.querySelector('.js-header');
     this.navLiElms = document.querySelectorAll('.js-nav li');
     this.registrationElm = document.querySelector('.js-registration');
@@ -33,18 +63,9 @@
   };
 
   Activation.prototype.selectPage = function() {
-    for(let cnt=0,len=this.section.length;cnt<len;++cnt) {
-      this.section[cnt].classList.add('disp--none');
-    }
     if(this.sentencesData.size) {
       this.pageData = (this.pageData) ? this.pageData : 'registration';
-      const pageNameArray = ['speedreading', 'typing', 'writing', 'dictation', 'registration', 'settings'];
-      for(let cnt=0,len=pageNameArray.length;cnt<len;++cnt) {
-        if(this.pageData==pageNameArray[cnt]) {
-          let pageElms = document.querySelector('.js-' + pageNameArray[cnt]);
-          pageElms.classList.remove('disp--none');  
-        }
-      }
+      selectPage(this.pageData);
       let cnt = (this.registrationTabData=='new') ? 0 : 1;
       this.registrationContElms[registrationContIndexArray[cnt][0]].classList.add('disp--none');
       this.registrationContElms[registrationContIndexArray[cnt][1]].classList.remove('disp--none');
@@ -99,7 +120,7 @@
     this.settingsListElm = document.querySelector('.js-settingsList');
     this.settingsBtnElms = document.querySelectorAll('.js-settingsBtn button');
 
-    this.sentencesData = sentencesDataGlobal;
+    this.sentencesData = sentencesDataAllGlobal;
     if(this.sentencesData.size) {
       this.showList();
     }
@@ -237,6 +258,13 @@
   Enhancer.prototype.initialize = function() {
     this.sentencesData = sentencesDataGlobal;
     this.pageData = pageDataGlobal;
+    this.selectSentences = document.querySelector('.js-selectSentences');
+    let selectSentencesOptionIndex = (allOrCheckedData=='all') ? 0 : 1;
+    this.selectSentences.options[selectSentencesOptionIndex].selected = true;
+    if(!sentencesDataCheckedGlobal.size) {
+      this.selectSentences.options[1].remove();
+      localStorage.setItem('allOrCheckedData', 'all');
+    }
 
     // speed reading
     this.speedreadingTextElm = document.querySelector('.js-speedreadingText');
@@ -319,6 +347,17 @@
     let note = '';
     let cnt = 0;
     let wpm = 0;
+
+    this.selectSentences.addEventListener('change', function() {
+      if(this.value=='toSettings') {
+        selectPage('settings');
+      }
+      else {
+        localStorage.setItem('allOrCheckedData', this.value);
+        window.location.reload(false);
+      }
+    });
+
     if(this.pageData=='speedreading') {
       this.speedreadingBtnElm.addEventListener('click', function() {
         if(!cnt) {
@@ -328,7 +367,14 @@
         }
         if(cnt%2) {
           let timeTaken = (Date.now()-this.startTime)/1000;
-          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((cnt+1)/2)-1]][1];
+          //**まとめたい　検討 */
+          let indexCnt = ((cnt+1)/2)-1;
+          if(that.sentenceDataArray.length == (indexCnt+1)) {
+            that.randomIndexArray = that.getRandomIndexArray(that.sentenceDataArray.length);
+            cnt = -1;
+          }
+          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[indexCnt]][1];
+          //**まとめたい　検討 */
           this.wpm = currentSentenceData.num/timeTaken*60;
           let wpmComment = (this.wpm>=wpm) ? '目標達成！': 'もう少し頑張ろう！';
           that.speedreadingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en + '</p>';
@@ -350,7 +396,7 @@
       currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
       note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
       let len = currentSentenceData.en.length;
-
+      
       // slash
       let currentSlashEnArray = currentSentenceData.slashEn.split(' / ');
       let currentSlashJpArray = currentSentenceData.slashJp.split(' / ');
@@ -378,7 +424,7 @@
             slashResult = '<p class="main__text">' + currentSlashEnArray[cnt].substring(slashSentenceCnt, slashSentenceLen) + '<br>';
             slashResult += currentSlashJpArray[cnt] + '</p>';
             note = (currentNoteArray[cnt]) ? '<p class="main__note">' + currentNoteArray[cnt] + '</p>' : '';
-            that.typingTextElm.innerHTML = slashResult + note + '<p class="main__note">' + currentSentenceData.en + '<br>' + currentSentenceData.jp + '</p>';
+            this.typingTextElm.innerHTML = slashResult + note + '<p class="main__note">' + currentSentenceData.en + '<br>' + currentSentenceData.jp + '</p>';
           }
         };
 
@@ -391,7 +437,7 @@
             ++currentIndex;
           }
           cnt = 0;
-          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[currentIndex]][1];
+          currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
         };
 
         if(isChecked) {
@@ -415,20 +461,23 @@
         }
         else {
           if(!cnt) {
-            that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
+            this.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
           }
-          if(that.sentenceDataArray[that.randomIndexArray[currentIndex]][1].en.charAt(cnt)==keyCode) {
+          if(this.sentenceDataArray[this.randomIndexArray[currentIndex]][1].en.charAt(cnt)==keyCode) {
             ++cnt;
-            that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
+            this.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
             if(!(len-cnt)){//next
               getNextSentence();
               len = currentSentenceData.en.length;
-              that.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
+              this.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
             }
+          }
+          else {//error
+            return;
           }
           note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
           div.innerHTML = note + '<p class="main__note">' + currentSentenceData.jp + '</p>';
-          this.typingTextElm.appendChild(div);  
+          this.typingTextElm.appendChild(div);
         }
       }
       window.addEventListener('keydown', typing);
@@ -437,11 +486,19 @@
       this.writingBtnElm.addEventListener('click', function() {
         ++cnt;
         if(cnt%2) {//result
-          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((cnt+1)/2)-1]][1];
+          let indexCnt = ((cnt+1)/2)-1;
+          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[indexCnt]][1];
           that.writingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.jp + '</p>';
           div.innerHTML = '<p class="main__text">' + currentSentenceData.en + '</p>';
           that.writingBtnElm.before(div);
           this.innerHTML = '次へ';
+          //**まとめたい　検討 */
+          if(that.sentenceDataArray.length == (indexCnt+1)) {
+            that.randomIndexArray = that.getRandomIndexArray(that.sentenceDataArray.length);
+            cnt = -1;
+            currentSentenceData = that.sentenceDataArray[that.randomIndexArray[indexCnt]][1];
+          }
+          //**まとめたい　検討 */
         }
         else {
           currentSentenceData = that.sentenceDataArray[that.randomIndexArray[(cnt/2)]][1];
@@ -503,11 +560,13 @@
 
       this.dictationResultBtnElm.addEventListener('click', function() {
         if(cnt%2) {
+          //**まとめたい　検討 */
           if(that.sentenceDataArray.length*2==cnt+1) {
             that.randomIndexArray = that.getRandomIndexArray(that.sentenceDataArray.length);
             cnt = -1;
           }
           currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((cnt+1)/2)]][1];
+          //**まとめたい　検討 */
           this.innerHTML = '確認';
           div.remove();
           isInitial = true;
