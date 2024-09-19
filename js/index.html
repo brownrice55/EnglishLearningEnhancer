@@ -44,15 +44,18 @@
         <div>
           <h3>英文（スラッシュ付き）<span class="required">※</span><br>
           <small>※「 / 」で区切ってください。</small></h3>
+          <span class="js-inputAlert alert"></span>
           <textarea class="js-input"></textarea>
         </div>
         <div>
           <h3>日本語訳<span class="required">※</span></h3>
+          <span class="js-inputAlert alert"></span>
           <textarea class="js-input"></textarea>
         </div>
         <div>
           <h3>スラッシュ訳<span class="required">※</span><br>
-          <small>※「 / 」で区切ってください。スラッシュ付き英文と対応する位置に日本語訳を入力してください</small></h3>
+          <small>※「 / 」で区切ってください。<br>スラッシュ付き英文と対応する位置に日本語訳を入力してください</small></h3>
+          <span class="js-inputAlert alert"></span>
           <textarea class="js-input"></textarea>
         </div>
         <div>
@@ -63,6 +66,7 @@
           <h3>音声パス</h3>
           <input type="text" class="js-input">
         </div>
+        <input type="hidden" class="js-input" value="false">
         <div class="registration__save">
           <button class="js-cancel disp--none">キャンセル</button>
           <button class="js-save" data-index="n">保存</button>

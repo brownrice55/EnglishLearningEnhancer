@@ -2,6 +2,7 @@
 @import '_destyle';
 
 $colorRed: #c00;
+$colorPink: #fee;
 $colorGray: #ccc;
 $colorDarkGray: #666;
 $colorLightGray: #f0f0f0;
@@ -114,6 +115,9 @@ $borderRadius : 4px;
     background: $colorLightGray;
     padding: 8px;
     margin: 0;
+    &.inputAlert {
+      background: $colorPink;
+    }
   }
   button {
     background: $colorGray;
@@ -194,4 +198,9 @@ $borderRadius : 4px;
 .required {
   color: $colorRed;
   font-size: rem(12px);
+}
+.alert {
+  color: $colorRed;
+  font-size: rem(14px);
+  display: block;
 }

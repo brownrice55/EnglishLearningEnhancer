@@ -117,6 +117,7 @@
     this.listTitleElm = document.querySelector('.js-listTitle');
     this.listTitleSpanElm = this.listTitleElm.querySelector('span');
     this.inputElms = document.querySelectorAll('.js-input');
+    this.inputAlertElms = document.querySelectorAll('.js-inputAlert');
     this.settingsListElm = document.querySelector('.js-settingsList');
     this.settingsBtnElms = document.querySelectorAll('.js-settingsBtn button');
 
@@ -157,11 +158,44 @@
   };
 
   DataManagement.prototype.saveData = function(aIndex, aSlashEn, aJp, aSlashJp, aNote, aPath, aIsChecked) {
-    for(let cnt=0,len=this.inputElms.length-2;cnt<len;++cnt) {
+    let alertTextType1Array = ['スラッシュ付きの英文', '日本語訳', 'スラッシュ付きの日本語訳'];
+    let alertTextType2 = '半角英数記号のみを入力してください。';
+    let alertTextType3 = '英文とスラッシュ訳のスラッシュの数を同じにしてください。';
+    let requiredLength = this.inputElms.length-3;
+    let alertTextDataArray = ['', '', ''];
+    let alertClassDataArray = [false, false, false];
+    for(let cnt=0;cnt<requiredLength;++cnt) {
+      this.inputAlertElms[cnt].innerHTML = '';
+      this.inputElms[cnt].classList.remove('inputAlert');
       if(!this.inputElms[cnt].value) {
-        return;
+        alertTextDataArray[cnt] = alertTextType1Array[cnt] + 'を入力してください。';
+        alertClassDataArray[cnt] = true;
       }
     }
+    if(!(this.inputElms[0].value.match(/^[ -~-\r|\n|\r\n]*$/))) {
+      alertTextDataArray[0] += alertTextDataArray[0] ? '<br>' + alertTextType2 : alertTextType2;
+      alertClassDataArray[0] = true;
+    }
+    if(!(!this.inputElms[0].value.match(/\//g) && !this.inputElms[2].value.match(/\//g))) {
+      let len0 = (this.inputElms[0].value.match(/\//g)) ? (this.inputElms[0].value.match(/\//g)).length : 0;
+      let len2 = (this.inputElms[2].value.match(/\//g)) ? (this.inputElms[2].value.match(/\//g)).length : 0;
+      if(len0!=len2) {
+        alertTextDataArray[0] += alertTextDataArray[0] ? '<br>' + alertTextType3 : alertTextType3;
+        alertTextDataArray[2] += alertTextDataArray[2] ? '<br>' + alertTextType3 : alertTextType3;
+        alertClassDataArray[0] = true;
+        alertClassDataArray[2] = true;
+      }
+    }
+    for(let cnt=0,len=alertClassDataArray.length;cnt<len;++cnt) {
+      if(alertClassDataArray[cnt]) {
+        this.inputAlertElms[cnt].innerHTML = alertTextDataArray[cnt];
+        this.inputElms[cnt].classList.add('inputAlert');
+      }
+    }
+    if(alertClassDataArray.includes(true)) {
+      return;
+    }
+
     let id = (aIndex=='n') ? this.sentencesData.size+1 : parseInt(aIndex);
     let enSlashString = this.inputElms[0].value.replace(/\ \ /g, ' ');
     let enString = enSlashString.replace(/\ \/\ /g, ' ');
@@ -172,24 +206,25 @@
     window.location.reload(false);
   };
 
-  DataManagement.prototype.setInputElms = function(aInput0, aInput1, aInput2, aInput3, aInput4) {
+  DataManagement.prototype.setInputElms = function(aInput0, aInput1, aInput2, aInput3, aInput4, aInput5) {
     this.inputElms[0].value = aInput0;
     this.inputElms[1].value = aInput1;
     this.inputElms[2].value = aInput2;
     this.inputElms[3].value = aInput3;
     this.inputElms[4].value = aInput4;
+    this.inputElms[5].value = aInput5;
   };
 
   DataManagement.prototype.setEvent = function() {
     let that = this;
     this.saveBtnElm.addEventListener('click', function() {
-      that.saveData(this.dataset.index, that.inputElms[0].value, that.inputElms[1].value, that.inputElms[2].value, that.inputElms[3].value, that.inputElms[4].value, false);
+      that.saveData(this.dataset.index, that.inputElms[0].value, that.inputElms[1].value, that.inputElms[2].value, that.inputElms[3].value, that.inputElms[4].value, that.inputElms[5].value);
     });
     if(!this.sentencesData.size) {
       return;
     }
     this.cancelBtnElm.addEventListener('click', function() {
-      that.setInputElms('','','','','');
+      that.setInputElms('','','','','','');
       that.registrationContElms[0].classList.add('disp--none');
       that.registrationContElms[1].classList.remove('disp--none');
       this.classList.add('disp--none');
@@ -201,7 +236,7 @@
         that.registrationTabData = 'edit';
         id = this.dataset.index;
         selectedData = that.sentencesData.get(parseInt(id));
-        that.setInputElms(selectedData.slashEn, selectedData.jp, selectedData.slashJp, selectedData.note, selectedData.path);
+        that.setInputElms(selectedData.slashEn, selectedData.jp, selectedData.slashJp, selectedData.note, selectedData.path, selectedData.isChecked);
         that.saveBtnElm.dataset.index = id;
         that.saveBtnElm.innerHTML = '上書き保存';
         that.cancelBtnElm.classList.remove('disp--none');

@@ -44,6 +44,7 @@ Could you please let me know if there are any errors in my English or code?</p>
 <li>設定のボタンの扱いを検討。</li>
 <li>設定の「設定」ボタンは差分がある時だけ表示するように変更する。</li>
 <li>「編集」と「設定」を同じ画面にした方が良いかもしれない？あるいは一覧画面でチェックがついている文章が分かるようにする？等、検討。</li>
+<li>ボタンを押下した時の反応を検討。</li>
 </ul>
 
 ### メモ-実装・対応済み
