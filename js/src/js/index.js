@@ -269,6 +269,7 @@
     // speed reading
     this.speedreadingTextElm = document.querySelector('.js-speedreadingText');
     this.speedreadingBtnElm = document.querySelector('.js-speedreadingBtn');
+    this.speedreadingCheckBtnElm = document.querySelector('.js-speedreadingCheckBtn');
     this.speedreadingWpmElm = document.querySelector('.js-speedreadingWpm');
     this.speedreadingWpmSelectElm = this.speedreadingWpmElm.querySelector('select');
 
@@ -381,14 +382,26 @@
           note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
           div.innerHTML = '<p class="main__note">' + currentSentenceData.slashEn + '<br>' + currentSentenceData.slashJp + '</p>' + note + '<p class="main__note">' + currentSentenceData.jp + '</p><p class="main__note">単語数：' + currentSentenceData.num + '語　かかった時間：' + timeTaken + '秒　WPM：' + Math.round(this.wpm) + '（' + wpmComment + '）</p>';
           that.speedreadingTextElm.appendChild(div);
+          if(allOrCheckedData=='all') {
+            that.speedreadingCheckBtnElm.classList.remove('disp--none');
+          }
           that.speedreadingBtnElm.innerHTML = '次の文章';
         }
         else {
           that.speedreadingTextElm.innerHTML = '<p class="main__text">' + that.sentenceDataArray[that.randomIndexArray[(cnt/2)]][1].en + '</p>';
+          if(allOrCheckedData=='all') {
+            that.speedreadingCheckBtnElm.classList.add('disp--none');
+          }
           that.speedreadingBtnElm.innerHTML = '読了';
           this.startTime = Date.now();
         }
         ++cnt;
+      });
+      this.speedreadingCheckBtnElm.addEventListener('click', function() {
+        let id = that.sentenceDataArray[that.randomIndexArray[((cnt-2)/2)]][0];
+        let value = that.sentenceDataArray[that.randomIndexArray[((cnt-2)/2)]][1];
+        that.sentencesData.set(id, { en:value.en, slashEn:value.slashEn, jp:value.jp, slashJp:value.slashJp, note:value.note, path:value.path, num:value.num, isChecked:true});
+        localStorage.setItem('sentencesData', JSON.stringify([...that.sentencesData]));
       });
     }
     else if(this.pageData=='typing') {
