@@ -27,10 +27,11 @@
   const registrationTabElmGlobal = document.querySelector('.js-registrationTab');
   const registrationTabLiElmsGlobal = registrationTabElmGlobal.querySelectorAll('li');
   const registrationContElmsGlobal = document.querySelectorAll('.js-registrationCont');
+  const selectSentencesGrobal = document.querySelector('.js-selectSentences');
 
   const selectPage = (aPageData) => {
     const section = document.querySelectorAll('section');
-    const selectSentences = document.querySelector('.js-selectSentences');
+    const selectSentences = selectSentencesGrobal;
     for(let cnt=0,len=section.length;cnt<len;++cnt) {
       section[cnt].classList.add('disp--none');
     }
@@ -176,9 +177,11 @@
       alertTextDataArray[0] += alertTextDataArray[0] ? '<br>' + alertTextType2 : alertTextType2;
       alertClassDataArray[0] = true;
     }
-    if(!(!this.inputElms[0].value.match(/\//g) && !this.inputElms[2].value.match(/\//g))) {
-      let len0 = (this.inputElms[0].value.match(/\//g)) ? (this.inputElms[0].value.match(/\//g)).length : 0;
-      let len2 = (this.inputElms[2].value.match(/\//g)) ? (this.inputElms[2].value.match(/\//g)).length : 0;
+    let inputMatchSlash0 = this.inputElms[0].value.match(/\//g);
+    let inputMatchSlash2 = this.inputElms[2].value.match(/\//g);
+    if(!(!inputMatchSlash0 && !inputMatchSlash2)) {
+      let len0 = (inputMatchSlash0) ? inputMatchSlash0.length : 0;
+      let len2 = (inputMatchSlash2) ? inputMatchSlash2.length : 0;
       if(len0!=len2) {
         alertTextDataArray[0] += alertTextDataArray[0] ? '<br>' + alertTextType3 : alertTextType3;
         alertTextDataArray[2] += alertTextDataArray[2] ? '<br>' + alertTextType3 : alertTextType3;
@@ -293,7 +296,7 @@
   Enhancer.prototype.initialize = function() {
     this.sentencesData = sentencesDataGlobal;
     this.pageData = pageDataGlobal;
-    this.selectSentences = document.querySelector('.js-selectSentences');
+    this.selectSentences = selectSentencesGrobal;
     let selectSentencesOptionIndex = (allOrCheckedData=='all') ? 0 : 1;
     this.selectSentences.options[selectSentencesOptionIndex].selected = true;
     if(!sentencesDataCheckedGlobal.size) {
@@ -403,14 +406,12 @@
         }
         if(cnt%2) {
           let timeTaken = (Date.now()-this.startTime)/1000;
-          //**まとめたい　検討 */
           let indexCnt = ((cnt+1)/2)-1;
           if(that.sentenceDataArray.length == (indexCnt+1)) {
             that.randomIndexArray = that.getRandomIndexArray(that.sentenceDataArray.length);
             cnt = -1;
           }
           currentSentenceData = that.sentenceDataArray[that.randomIndexArray[indexCnt]][1];
-          //**まとめたい　検討 */
           this.wpm = currentSentenceData.num/timeTaken*60;
           let wpmComment = (this.wpm>=wpm) ? '目標達成！': 'もう少し頑張ろう！';
           that.speedreadingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en + '</p>';
@@ -540,13 +541,11 @@
           div.innerHTML = '<p class="main__text">' + currentSentenceData.en + '</p>';
           that.writingBtnElm.before(div);
           this.innerHTML = '次へ';
-          //**まとめたい　検討 */
           if(that.sentenceDataArray.length == (indexCnt+1)) {
             that.randomIndexArray = that.getRandomIndexArray(that.sentenceDataArray.length);
             cnt = -1;
             currentSentenceData = that.sentenceDataArray[that.randomIndexArray[indexCnt]][1];
           }
-          //**まとめたい　検討 */
         }
         else {
           currentSentenceData = that.sentenceDataArray[that.randomIndexArray[(cnt/2)]][1];
@@ -608,13 +607,11 @@
 
       this.dictationResultBtnElm.addEventListener('click', function() {
         if(cnt%2) {
-          //**まとめたい　検討 */
           if(that.sentenceDataArray.length*2==cnt+1) {
             that.randomIndexArray = that.getRandomIndexArray(that.sentenceDataArray.length);
             cnt = -1;
           }
           currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((cnt+1)/2)]][1];
-          //**まとめたい　検討 */
           this.innerHTML = '確認';
           div.remove();
           isInitial = true;
