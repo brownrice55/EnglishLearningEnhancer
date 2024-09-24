@@ -317,6 +317,7 @@
     this.wpm = 0;
     this.selectedWpm = 0;
     this.timeTaken = (Date.now()-this.startTime)/1000;
+    this.timerID = 0;
     // speed reading
 
     // typing
@@ -401,24 +402,18 @@
     });
 
     if(this.pageData=='speedreading') {
-      let timerID = 0;
-      let m = '';
-      let s = '';
-      let ms = '';
-      let currentTime = 0;
-      let wpmClass = '';
       this.currentSentenceData = this.sentenceDataArray[this.randomIndexArray[0]][1];
 
-      const displayTime = ()=> {
+      const displayTimeAndWpm = () => {
         that.timeTaken = Date.now() - that.startTime;
-        currentTime = new Date(that.timeTaken + that.stopTime);
-        m = String(currentTime.getMinutes()).padStart(2, '0');
-        s = String(currentTime.getSeconds()).padStart(2, '0');
-        ms = String(currentTime.getMilliseconds()).padStart(3, '0');
-        wpmClass = (that.wpm>=that.selectedWpm) ? '' : ' class="alert"';
+        let currentTime = new Date(that.timeTaken + that.stopTime);
+        let m = String(currentTime.getMinutes()).padStart(2, '0');
+        let s = String(currentTime.getSeconds()).padStart(2, '0');
+        let ms = String(currentTime.getMilliseconds()).padStart(3, '0');
+        let wpmClass = (that.wpm>=that.selectedWpm) ? '' : ' class="alert"';
         that.wpm = Math.round(that.currentSentenceData.num/(that.timeTaken/1000)*60);
         that.timeElm.innerHTML = m + ':' + s + '.' + ms + '　<span' + wpmClass + '>WPM:' + that.wpm + '</span>';
-        timerID = setTimeout(displayTime, 30);
+        that.timerID = setTimeout(displayTimeAndWpm, 30);
       };
 
       this.speedreadingBtnElm.addEventListener('click', function() {
@@ -428,7 +423,7 @@
           that.selectedWpm = that.speedreadingWpmSelectElm.value;
         }
         if(cnt%2) {
-          clearTimeout(timerID);
+          clearTimeout(that.timerID);
           let wpmComment = (that.wpm>=that.selectedWpm) ? '目標達成！': 'もう少し頑張ろう！';
           let indexCnt = ((cnt+1)/2)-1;
           if(that.sentenceDataArray.length == (indexCnt+1)) {
@@ -454,7 +449,7 @@
           that.speedreadingBtnElm.innerHTML = '読了';
           that.startTime = Date.now();
           that.stopTime = 0;
-          displayTime();
+          displayTimeAndWpm();
         }
         ++cnt;
       });
