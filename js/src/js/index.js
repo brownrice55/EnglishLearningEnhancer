@@ -310,9 +310,13 @@
     this.speedreadingCheckBtnElm = document.querySelector('.js-speedreadingCheckBtn');
     this.speedreadingWpmElm = document.querySelector('.js-speedreadingWpm');
     this.speedreadingWpmSelectElm = this.speedreadingWpmElm.querySelector('select');
+    this.timeElm = document.querySelector('.js-time');
 
     this.startTime = 0;
+    this.stopTime = 0;
     this.wpm = 0;
+    this.selectedWpm = 0;
+    this.timeTaken = (Date.now()-this.startTime)/1000;
     // speed reading
 
     // typing
@@ -358,7 +362,7 @@
     let initialSentenceData = this.sentenceDataArray[this.randomIndexArray[0]][1];
 
     if(this.pageData=='speedreading') {
-      this.speedreadingTextElm.innerHTML = '<p class="main__text">' + initialSentenceData.en + '</p>';  
+      this.speedreadingTextElm.innerHTML = '<p class="main__text">' + initialSentenceData.en + '</p>';
     }
     else if(this.pageData=='typing') {
       this.typingTextElm.innerHTML = '<p>英文を訳しながらタイピングしましょう。<br>キーボードのキーを押すとスタートします。</p>';
@@ -385,7 +389,6 @@
     let currentSentenceData = '';
     let note = '';
     let cnt = 0;
-    let wpm = 0;
 
     this.selectSentences.addEventListener('change', function() {
       if(this.value=='toSettings') {
@@ -398,38 +401,60 @@
     });
 
     if(this.pageData=='speedreading') {
+      let timerID = 0;
+      let m = '';
+      let s = '';
+      let ms = '';
+      let currentTime = 0;
+      let wpmClass = '';
+      this.currentSentenceData = this.sentenceDataArray[this.randomIndexArray[0]][1];
+
+      const displayTime = ()=> {
+        that.timeTaken = Date.now() - that.startTime;
+        currentTime = new Date(that.timeTaken + that.stopTime);
+        m = String(currentTime.getMinutes()).padStart(2, '0');
+        s = String(currentTime.getSeconds()).padStart(2, '0');
+        ms = String(currentTime.getMilliseconds()).padStart(3, '0');
+        wpmClass = (that.wpm>=that.selectedWpm) ? '' : ' class="alert"';
+        that.wpm = Math.round(that.currentSentenceData.num/(that.timeTaken/1000)*60);
+        that.timeElm.innerHTML = m + ':' + s + '.' + ms + '　<span' + wpmClass + '>WPM:' + that.wpm + '</span>';
+        timerID = setTimeout(displayTime, 30);
+      };
+
       this.speedreadingBtnElm.addEventListener('click', function() {
         if(!cnt) {
           that.speedreadingTextElm.classList.remove('disp--none');
           that.speedreadingWpmElm.classList.add('disp--none');
-          wpm = that.speedreadingWpmSelectElm.value;
+          that.selectedWpm = that.speedreadingWpmSelectElm.value;
         }
         if(cnt%2) {
-          let timeTaken = (Date.now()-this.startTime)/1000;
+          clearTimeout(timerID);
+          let wpmComment = (that.wpm>=that.selectedWpm) ? '目標達成！': 'もう少し頑張ろう！';
           let indexCnt = ((cnt+1)/2)-1;
           if(that.sentenceDataArray.length == (indexCnt+1)) {
             that.randomIndexArray = that.getRandomIndexArray(that.sentenceDataArray.length);
             cnt = -1;
           }
-          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[indexCnt]][1];
-          this.wpm = currentSentenceData.num/timeTaken*60;
-          let wpmComment = (this.wpm>=wpm) ? '目標達成！': 'もう少し頑張ろう！';
-          that.speedreadingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en + '</p>';
-          note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
-          div.innerHTML = '<p class="main__note">' + currentSentenceData.slashEn + '<br>' + currentSentenceData.slashJp + '</p>' + note + '<p class="main__note">' + currentSentenceData.jp + '</p><p class="main__note">単語数：' + currentSentenceData.num + '語　かかった時間：' + timeTaken + '秒　WPM：' + Math.round(this.wpm) + '（' + wpmComment + '）</p>';
+          that.currentSentenceData = that.sentenceDataArray[that.randomIndexArray[indexCnt]][1];
+          that.speedreadingTextElm.innerHTML = '<p class="main__text">' + that.currentSentenceData.en + '</p>';
+          note = (that.currentSentenceData.note) ? '<p class="main__note">' + that.currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
+          div.innerHTML = '<p class="main__note">' + that.currentSentenceData.slashEn + '<br>' + that.currentSentenceData.slashJp + '</p>' + note + '<p class="main__note">' + that.currentSentenceData.jp + '</p><p class="main__note">単語数：' + that.currentSentenceData.num + '語　かかった時間：' + that.timeTaken + '秒　WPM：' + that.wpm + '（' + wpmComment + '）</p>';
           that.speedreadingTextElm.appendChild(div);
           if(allOrCheckedData=='all') {
             that.speedreadingCheckBtnElm.classList.remove('disp--none');
           }
           that.speedreadingBtnElm.innerHTML = '次の文章';
+          that.stopTime = Date.now() - that.startTime;
         }
-        else {
+        else { // start
           that.speedreadingTextElm.innerHTML = '<p class="main__text">' + that.sentenceDataArray[that.randomIndexArray[(cnt/2)]][1].en + '</p>';
           if(allOrCheckedData=='all') {
             that.speedreadingCheckBtnElm.classList.add('disp--none');
           }
           that.speedreadingBtnElm.innerHTML = '読了';
-          this.startTime = Date.now();
+          that.startTime = Date.now();
+          that.stopTime = 0;
+          displayTime();
         }
         ++cnt;
       });

@@ -66,6 +66,8 @@ Could you please let me know if there are any errors in my English or code?</p>
 <li>https://web-creates.com/code/js-web-speech-api/</li>
 <li>https://1-notes.com/javascript-speechsynthesisutterance-pause-and-resume/</li>
 <li>https://www.cyokodog.net/blog/web-speechi-api/</li>
+<li>https://tcd-theme.com/2022/06/javascript-stopwatch.html</li>
+<li>https://qiita.com/silane1001/items/a29602c7c8c507349e4e</li>
 </ul>
 
 ### Fisher-Yates shuffle関連 

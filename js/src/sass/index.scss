@@ -190,6 +190,15 @@ $borderRadius : 4px;
       content: '';
     }
   }
+  &__time {
+    font-size: rem(18px);
+    color: $colorDarkGray;
+    .alert {
+      color: $colorRed;
+      font-size: rem(18px);
+      display: inline;
+    }
+  }
 }
 
 .disp--none {
