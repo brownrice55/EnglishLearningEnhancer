@@ -387,7 +387,7 @@
   Enhancer.prototype.setEvent = function() {
     let that = this;
     let div = document.createElement('div');
-    let currentSentenceData = '';
+    this.currentSentenceData = '';
     let note = '';
     let cnt = 0;
 
@@ -461,15 +461,34 @@
       });
     }
     else if(this.pageData=='typing') {
+
+      const getNote = (aCurrentSentenceNoteData) => {
+        if(!aCurrentSentenceNoteData) {
+          return '';
+        }
+        let noteData = '';
+        note = '';
+        if(aCurrentSentenceNoteData) {
+          let currentSentenceDataNoteArray = aCurrentSentenceNoteData.split(',');
+          for(let cnt=0,len=currentSentenceDataNoteArray.length;cnt<len;++cnt) {
+            if(currentSentenceDataNoteArray[cnt]) {
+              note += currentSentenceDataNoteArray[cnt];
+            }
+          }
+          noteData = '<p class="main__note">' + note + '</p>';
+        }
+        return noteData;
+      };
+
       let currentIndex = 0;
-      currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
-      note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
-      let len = currentSentenceData.en.length;
+      this.currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
+      note = getNote(this.currentSentenceData.note);
+      let len = this.currentSentenceData.en.length;
       
       // slash
-      let currentSlashEnArray = currentSentenceData.slashEn.split(' / ');
-      let currentSlashJpArray = currentSentenceData.slashJp.split(' / ');
-      let currentNoteArray = currentSentenceData.note.split(',');
+      let currentSlashEnArray = this.currentSentenceData.slashEn.split(' / ');
+      let currentSlashJpArray = this.currentSentenceData.slashJp.split(' / ');
+      let currentNoteArray = this.currentSentenceData.note.split(',');
       let slashSentenceCnt = 0;
       let slashSentenceLen = currentSlashEnArray[0].length;
       // slash
@@ -481,9 +500,9 @@
         that.typingTextElm.classList.remove('disp--none');
       });
 
-      let slashResult = '';
       const typing = (event) => {
         let keyCode = event.key;
+        let slashResult = '';
         const slashSentence = () => {
           if(!slashSentenceCnt || currentSlashEnArray[cnt].charAt(slashSentenceCnt)==keyCode) {
             if(currentSlashEnArray[cnt].charAt(slashSentenceCnt)==keyCode && keyCode!='duplication') {
@@ -492,8 +511,8 @@
             }
             slashResult = '<p class="main__text">' + currentSlashEnArray[cnt].substring(slashSentenceCnt, slashSentenceLen) + '<br>';
             slashResult += currentSlashJpArray[cnt] + '</p>';
-            note = (currentNoteArray[cnt]) ? '<p class="main__note">' + currentNoteArray[cnt] + '</p>' : '';
-            this.typingTextElm.innerHTML = slashResult + note + '<p class="main__note">' + currentSentenceData.en + '<br>' + currentSentenceData.jp + '</p>';
+            note = getNote(currentNoteArray[cnt]);
+            this.typingTextElm.innerHTML = slashResult + note + '<p class="main__note">' + this.currentSentenceData.en + '<br>' + this.currentSentenceData.jp + '</p>';
           }
         };
 
@@ -506,7 +525,7 @@
             ++currentIndex;
           }
           cnt = 0;
-          currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
+          this.currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
         };
 
         if(isChecked) {
@@ -520,9 +539,9 @@
             }
             else {
               getNextSentence();
-              currentSlashEnArray = currentSentenceData.slashEn.split(' / ');
-              currentSlashJpArray = currentSentenceData.slashJp.split(' / ');
-              currentNoteArray = currentSentenceData.note.split(',');
+              currentSlashEnArray = this.currentSentenceData.slashEn.split(' / ');
+              currentSlashJpArray = this.currentSentenceData.slashJp.split(' / ');
+              currentNoteArray = this.currentSentenceData.note.split(',');
               slashSentenceLen = currentSlashEnArray[cnt].length;
               slashSentence();  
             }
@@ -530,23 +549,25 @@
         }
         else {
           if(!cnt) {
-            this.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
+            note = getNote(this.currentSentenceData.note);
+            this.typingTextElm.innerHTML = '<p class="main__text">' + this.currentSentenceData.en.substring(cnt, len) + '</p>';
+            div.innerHTML = note + '<p class="main__note">' + this.currentSentenceData.jp + '</p>';
+            this.typingTextElm.appendChild(div);
           }
           if(this.sentenceDataArray[this.randomIndexArray[currentIndex]][1].en.charAt(cnt)==keyCode) {
             ++cnt;
-            this.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
             if(!(len-cnt)){//next
               getNextSentence();
-              len = currentSentenceData.en.length;
-              this.typingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.en.substring(cnt, len) + '</p>';
+              len = this.currentSentenceData.en.length;
             }
+            note = getNote(this.currentSentenceData.note);
+            this.typingTextElm.innerHTML = '<p class="main__text">' + this.currentSentenceData.en.substring(cnt, len) + '</p>';
+            div.innerHTML = note + '<p class="main__note">' + this.currentSentenceData.jp + '</p>';
+            this.typingTextElm.appendChild(div);
           }
           else {//error
             return;
           }
-          note = (currentSentenceData.note) ? '<p class="main__note">' + currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
-          div.innerHTML = note + '<p class="main__note">' + currentSentenceData.jp + '</p>';
-          this.typingTextElm.appendChild(div);
         }
       }
       window.addEventListener('keydown', typing);
@@ -556,21 +577,21 @@
         ++cnt;
         if(cnt%2) {//result
           let indexCnt = ((cnt+1)/2)-1;
-          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[indexCnt]][1];
-          that.writingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.jp + '</p>';
-          div.innerHTML = '<p class="main__text">' + currentSentenceData.en + '</p>';
+          that.currentSentenceData = that.sentenceDataArray[that.randomIndexArray[indexCnt]][1];
+          that.writingTextElm.innerHTML = '<p class="main__text">' + that.currentSentenceData.jp + '</p>';
+          div.innerHTML = '<p class="main__text">' + that.currentSentenceData.en + '</p>';
           that.writingBtnElm.before(div);
           this.innerHTML = '次へ';
           if(that.sentenceDataArray.length == (indexCnt+1)) {
             that.randomIndexArray = that.getRandomIndexArray(that.sentenceDataArray.length);
             cnt = -1;
-            currentSentenceData = that.sentenceDataArray[that.randomIndexArray[indexCnt]][1];
+            that.currentSentenceData = that.sentenceDataArray[that.randomIndexArray[indexCnt]][1];
           }
         }
         else {
-          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[(cnt/2)]][1];
-          note = (currentSentenceData.note) ? '<p class="main__note">ヒント：' + currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
-          that.writingTextElm.innerHTML = '<p class="main__text">' + currentSentenceData.jp + '</p>' + note;
+          that.currentSentenceData = that.sentenceDataArray[that.randomIndexArray[(cnt/2)]][1];
+          note = (that.currentSentenceData.note) ? '<p class="main__note">ヒント：' + that.currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
+          that.writingTextElm.innerHTML = '<p class="main__text">' + that.currentSentenceData.jp + '</p>' + note;
           that.writingInputElm.value = '';
           div.innerHTML = '';
           this.innerHTML = '確認';
@@ -578,7 +599,7 @@
       });
     }
     else if(this.pageData=='dictation') {
-      currentSentenceData = this.sentenceDataArray[this.randomIndexArray[0]][1];
+      this.currentSentenceData = this.sentenceDataArray[this.randomIndexArray[0]][1];
       for(let cnt=0;cnt<2;++cnt) {
         this.dictationNavElms[cnt].addEventListener('click', function() {
           that.dictationAudioType = event.target.dataset.type;
@@ -589,7 +610,7 @@
           that.dictationNavElms[dictationAudioTypeIndexArray[1]].classList.remove('active');
         });
       }
-      if(!currentSentenceData.path) { //pathがない時はナビを表示しない
+      if(!this.currentSentenceData.path) { //pathがない時はナビを表示しない
         this.dictationSectionElms[0].classList.add('disp--none');
         this.dictationSectionElms[1].classList.remove('disp--none');
         this.dictationNavElms[0].parentNode.classList.add('disp--none');
@@ -597,14 +618,14 @@
 
       let isPlaying = false;
       let isInitial = true;
-      let audio = new SpeechSynthesisUtterance(currentSentenceData.en);
+      let audio = new SpeechSynthesisUtterance(this.currentSentenceData.en);
       this.dictationBtnElm.addEventListener('click', function() {
         isPlaying = !isPlaying;
         if(isInitial) {
           isInitial = false;
           this.innerHTML = '一時停止';
           speechSynthesis.cancel();
-          audio = new SpeechSynthesisUtterance(currentSentenceData.en);
+          audio = new SpeechSynthesisUtterance(that.currentSentenceData.en);
           audio.lang = that.dictationSelectLangElm.value;
           audio.rate = that.dictationSelectRateElm.value;
           speechSynthesis.speak(audio);
@@ -631,15 +652,15 @@
             that.randomIndexArray = that.getRandomIndexArray(that.sentenceDataArray.length);
             cnt = -1;
           }
-          currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((cnt+1)/2)]][1];
+          that.currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((cnt+1)/2)]][1];
           this.innerHTML = '確認';
           div.remove();
           isInitial = true;
           speechSynthesis.cancel();
           that.dictationBtnElm.innerHTML = '音声スタート';
-          if(currentSentenceData.path) {
+          if(that.currentSentenceData.path) {
             that.dictationInputElm.value = '';
-            that.dictationSectionElms[0].innerHTML = '<video playsinline controls><source src="' + currentSentenceData.path + '" type="video/mp4"></video>';
+            that.dictationSectionElms[0].innerHTML = '<video playsinline controls><source src="' + that.currentSentenceData.path + '" type="video/mp4"></video>';
             that.dictationNavElms[0].parentNode.classList.remove('disp--none');
             that.dictationNavElms[0].classList.add('active');
             that.dictationNavElms[1].classList.remove('active');
@@ -653,7 +674,7 @@
           }
         }
         else {
-          div.innerHTML = '<p class="main__note">' + currentSentenceData.en + '</p><p class="main__note">' + currentSentenceData.jp + '</p>';
+          div.innerHTML = '<p class="main__note">' + that.currentSentenceData.en + '</p><p class="main__note">' + that.currentSentenceData.jp + '</p>';
           this.before(div);
           this.innerHTML = '次へ';
         }
