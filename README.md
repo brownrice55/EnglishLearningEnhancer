@@ -35,7 +35,6 @@ Could you please let me know if there are any errors in my English or code?</p>
 <ul>
 <li>WPMを保存して経過を確認できるようにしたい。</li>
 <li>速く読めた文章はしばらく表示しないようにしたい（それぞれの機能の練習回数等の履歴を表示するか検討する）。</li>
-<li>勉強中に残りの問題数を表示するか検討。</li>
 <li>自動音声の動きが変なので見直す。</li>
 <li>登録のページの削除について、どのように設置するか検討。</li>
 <li>設定のボタンの扱いを検討。</li>
@@ -57,6 +56,7 @@ Could you please let me know if there are any errors in my English or code?</p>
 <li><s>入力の際にスラッシュの数が違う時にアラートを出す。</s></li>
 <li><s>速読のページにストップウォッチを表示（読むときに焦るようにする）。同時にWPMも表示して、目標に届かない時は焦るようにする。</s></li>
 <li><s>速読のページにテキストエリアを設けて、きちんと訳す練習ができるようにするか検討。</s></li>
+<li><s>勉強中に残りの問題数を表示するか検討。</s></li>
 </ul>
 
 ## 参考

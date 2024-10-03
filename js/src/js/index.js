@@ -47,6 +47,28 @@
     }
   };
 
+  const getNote = (aCurrentSentenceNoteData, aNeedHint) => {
+    if(!aCurrentSentenceNoteData) {
+      return '';
+    }
+    let noteData = '';
+    note = '';
+    if(aCurrentSentenceNoteData) {
+      let currentSentenceDataNoteArray = aCurrentSentenceNoteData.split(',');
+      for(let cnt=0,len=currentSentenceDataNoteArray.length;cnt<len;++cnt) {
+        if(currentSentenceDataNoteArray[cnt]) {
+          note += currentSentenceDataNoteArray[cnt];
+          if(currentSentenceDataNoteArray[cnt+1] && cnt) {
+            note += '　';
+          }
+        }
+      }
+      let hint = (aNeedHint) ? 'ヒント：' : '';
+      noteData = '<p class="main__note">' + hint + note + '</p>';
+    }
+    return noteData;
+  };
+
   const Activation = function() {
     this.initialize.apply(this, arguments);
   };
@@ -369,8 +391,8 @@
       this.typingTextElm.innerHTML = '<p>英文を訳しながらタイピングしましょう。<br>キーボードのキーを押すとスタートします。</p>';
     }
     else if(this.pageData=='writing') {
-      note = (initialSentenceData.note) ? '<p class="main__note">ヒント：' + initialSentenceData.note.replace(/,/g, '　') + '</p>' : '';
-      this.writingTextElm.innerHTML = '<p class="main__text">' + initialSentenceData.jp + '</p>';  
+      note = (initialSentenceData.note) ? getNote(initialSentenceData.note, true) : '';
+      this.writingTextElm.innerHTML = '<p class="main__text">' + initialSentenceData.jp + '</p>';
     }
     else if(this.pageData=='dictation') {
       this.dictationAudioType = 'path';
@@ -432,7 +454,7 @@
           }
           that.currentSentenceData = that.sentenceDataArray[that.randomIndexArray[indexCnt]][1];
           that.speedreadingTextElm.innerHTML = '<p class="main__text">' + that.currentSentenceData.en + '</p>';
-          note = (that.currentSentenceData.note) ? '<p class="main__note">' + that.currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
+          note = (that.currentSentenceData.note) ? getNote(that.currentSentenceData.note, false) : '';
           div.innerHTML = '<p class="main__note">' + that.currentSentenceData.slashEn + '<br>' + that.currentSentenceData.slashJp + '</p>' + note + '<p class="main__note">' + that.currentSentenceData.jp + '</p><p class="main__note">単語数：' + that.currentSentenceData.num + '語　かかった時間：' + that.timeTaken + '秒　WPM：' + that.wpm + '（' + wpmComment + '）</p>';
           that.speedreadingTextElm.appendChild(div);
           if(allOrCheckedData=='all') {
@@ -462,27 +484,9 @@
     }
     else if(this.pageData=='typing') {
 
-      const getNote = (aCurrentSentenceNoteData) => {
-        if(!aCurrentSentenceNoteData) {
-          return '';
-        }
-        let noteData = '';
-        note = '';
-        if(aCurrentSentenceNoteData) {
-          let currentSentenceDataNoteArray = aCurrentSentenceNoteData.split(',');
-          for(let cnt=0,len=currentSentenceDataNoteArray.length;cnt<len;++cnt) {
-            if(currentSentenceDataNoteArray[cnt]) {
-              note += currentSentenceDataNoteArray[cnt];
-            }
-          }
-          noteData = '<p class="main__note">' + note + '</p>';
-        }
-        return noteData;
-      };
-
       let currentIndex = 0;
       this.currentSentenceData = this.sentenceDataArray[this.randomIndexArray[currentIndex]][1];
-      note = getNote(this.currentSentenceData.note);
+      note = getNote(this.currentSentenceData.note, false);
       let len = this.currentSentenceData.en.length;
       
       // slash
@@ -511,7 +515,7 @@
             }
             slashResult = '<p class="main__text">' + currentSlashEnArray[cnt].substring(slashSentenceCnt, slashSentenceLen) + '<br>';
             slashResult += currentSlashJpArray[cnt] + '</p>';
-            note = getNote(currentNoteArray[cnt]);
+            note = getNote(currentNoteArray[cnt], false);
             this.typingTextElm.innerHTML = slashResult + note + '<p class="main__note">' + this.currentSentenceData.en + '<br>' + this.currentSentenceData.jp + '</p>';
           }
         };
@@ -549,7 +553,7 @@
         }
         else {
           if(!cnt) {
-            note = getNote(this.currentSentenceData.note);
+            note = getNote(this.currentSentenceData.note, false);
             this.typingTextElm.innerHTML = '<p class="main__text">' + this.currentSentenceData.en.substring(cnt, len) + '</p>';
             div.innerHTML = note + '<p class="main__note">' + this.currentSentenceData.jp + '</p>';
             this.typingTextElm.appendChild(div);
@@ -560,7 +564,7 @@
               getNextSentence();
               len = this.currentSentenceData.en.length;
             }
-            note = getNote(this.currentSentenceData.note);
+            note = getNote(this.currentSentenceData.note, false);
             this.typingTextElm.innerHTML = '<p class="main__text">' + this.currentSentenceData.en.substring(cnt, len) + '</p>';
             div.innerHTML = note + '<p class="main__note">' + this.currentSentenceData.jp + '</p>';
             this.typingTextElm.appendChild(div);
@@ -590,7 +594,7 @@
         }
         else {
           that.currentSentenceData = that.sentenceDataArray[that.randomIndexArray[(cnt/2)]][1];
-          note = (that.currentSentenceData.note) ? '<p class="main__note">ヒント：' + that.currentSentenceData.note.replace(/,/g, '　') + '</p>' : '';
+          note = (that.currentSentenceData.note) ? getNote(that.currentSentenceData.note, true) : '';
           that.writingTextElm.innerHTML = '<p class="main__text">' + that.currentSentenceData.jp + '</p>' + note;
           that.writingInputElm.value = '';
           div.innerHTML = '';
