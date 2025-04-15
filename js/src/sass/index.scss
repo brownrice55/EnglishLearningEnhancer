@@ -52,6 +52,9 @@ $borderRadius : 4px;
   margin: 0 auto;
   padding-top: 80px;
   text-align: center;
+  &--initial {
+    padding-top: 20px;
+  }
   .registration {
     padding-bottom: 70px;
     &__tab {

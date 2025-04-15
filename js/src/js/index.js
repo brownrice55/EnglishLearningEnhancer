@@ -96,11 +96,13 @@
       this.registrationTabLiElms[registrationContIndexArray[cnt][0]].classList.remove('active');
     }
     else { //initial
-      this.registrationElm.classList.remove('disp--none');
+      const mainElm = document.querySelector('.js-main');
+      mainElm.classList.add('main--initial');
+      selectPage('registration');
       this.headerElm.classList.add('disp--none');
       this.registrationContElms[0].classList.remove('disp--none');
       this.registrationContElms[1].classList.add('disp--none');
-      this.registrationTabElm.classList.add('disp--none');  
+      this.registrationTabElm.classList.add('disp--none');
     }
   };
 
