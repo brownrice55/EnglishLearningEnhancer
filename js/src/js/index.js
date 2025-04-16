@@ -14,7 +14,7 @@
     sentencesDataAllGlobal.forEach((value, key) => {
       ++sentencesDataCheckedGlobalIdCnt;
       if(value.isChecked) {
-        sentencesDataCheckedGlobal.set(sentencesDataCheckedGlobalIdCnt, { en:value.en, slashEn:value.slashEn, jp:value.jp, slashJp:value.slashJp, note:value.note, path:value.path, num:value.num, isChecked:value.isChecked});
+        sentencesDataCheckedGlobal.set(sentencesDataCheckedGlobalIdCnt, { en:value.en, slashEn:value.slashEn, jp:value.jp, slashJp:value.slashJp, note:value.note, num:value.num, isChecked:value.isChecked});
       }
     });
     sentencesDataGlobal = (sentencesDataCheckedGlobal.size && (allOrCheckedData=='checked')) ? sentencesDataCheckedGlobal : sentencesDataAllGlobal;
@@ -182,11 +182,11 @@
     this.settingsListInputElms = document.querySelectorAll('.js-settingsList input');
   };
 
-  DataManagement.prototype.saveData = function(aIndex, aSlashEn, aJp, aSlashJp, aNote, aPath, aIsChecked) {
+  DataManagement.prototype.saveData = function(aIndex, aSlashEn, aJp, aSlashJp, aNote, aIsChecked) {
     let alertTextType1Array = ['スラッシュ付きの英文', '日本語訳', 'スラッシュ付きの日本語訳'];
     let alertTextType2 = '半角英数記号のみを入力してください。';
     let alertTextType3 = '英文とスラッシュ訳のスラッシュの数を同じにしてください。';
-    let requiredLength = this.inputElms.length-3;
+    let requiredLength = this.inputElms.length-2;
     let alertTextDataArray = ['', '', ''];
     let alertClassDataArray = [false, false, false];
     for(let cnt=0;cnt<requiredLength;++cnt) {
@@ -227,31 +227,30 @@
     let enSlashString = this.inputElms[0].value.replace(/\ \ /g, ' ');
     let enString = enSlashString.replace(/\ \/\ /g, ' ');
     let enStringArray = enString.split(' ');
-    this.sentencesData.set(id, { en:enString, slashEn:enSlashString, jp:aJp, slashJp:aSlashJp, note:aNote, path:aPath, num:enStringArray.length, isChecked:aIsChecked});
+    this.sentencesData.set(id, { en:enString, slashEn:enSlashString, jp:aJp, slashJp:aSlashJp, note:aNote, num:enStringArray.length, isChecked:aIsChecked});
     localStorage.setItem('sentencesData', JSON.stringify([...this.sentencesData]));
     localStorage.setItem('registrationTabData', this.registrationTabData);
     window.location.reload(false);
   };
 
-  DataManagement.prototype.setInputElms = function(aInput0, aInput1, aInput2, aInput3, aInput4, aInput5) {
+  DataManagement.prototype.setInputElms = function(aInput0, aInput1, aInput2, aInput3, aInput4) {
     this.inputElms[0].value = aInput0;
     this.inputElms[1].value = aInput1;
     this.inputElms[2].value = aInput2;
     this.inputElms[3].value = aInput3;
     this.inputElms[4].value = aInput4;
-    this.inputElms[5].value = aInput5;
   };
 
   DataManagement.prototype.setEvent = function() {
     let that = this;
     this.saveBtnElm.addEventListener('click', function() {
-      that.saveData(this.dataset.index, that.inputElms[0].value, that.inputElms[1].value, that.inputElms[2].value, that.inputElms[3].value, that.inputElms[4].value, that.inputElms[5].value);
+      that.saveData(this.dataset.index, that.inputElms[0].value, that.inputElms[1].value, that.inputElms[2].value, that.inputElms[3].value, that.inputElms[4].value);
     });
     if(!this.sentencesData.size) {
       return;
     }
     this.cancelBtnElm.addEventListener('click', function() {
-      that.setInputElms('','','','','','');
+      that.setInputElms('','','','','');
       that.registrationContElms[0].classList.add('disp--none');
       that.registrationContElms[1].classList.remove('disp--none');
       this.classList.add('disp--none');
@@ -263,7 +262,7 @@
         that.registrationTabData = 'edit';
         id = this.dataset.index;
         selectedData = that.sentencesData.get(parseInt(id));
-        that.setInputElms(selectedData.slashEn, selectedData.jp, selectedData.slashJp, selectedData.note, selectedData.path, selectedData.isChecked);
+        that.setInputElms(selectedData.slashEn, selectedData.jp, selectedData.slashJp, selectedData.note, selectedData.isChecked);
         that.saveBtnElm.dataset.index = id;
         that.saveBtnElm.innerHTML = '上書き保存';
         that.cancelBtnElm.classList.remove('disp--none');
@@ -289,7 +288,7 @@
         that.settingsBtnElms[0].parentNode.classList.remove('disp--none');
         id = this.parentNode.parentNode.dataset.index;
         selectedData = that.sentencesData.get(parseInt(id));
-        that.sentencesData.set(parseInt(id), { en:selectedData.en, slashEn:selectedData.slashEn, jp:selectedData.jp, slashJp:selectedData.slashJp, note:selectedData.note, path:selectedData.path, num:selectedData.num, isChecked:this.checked});
+        that.sentencesData.set(parseInt(id), { en:selectedData.en, slashEn:selectedData.slashEn, jp:selectedData.jp, slashJp:selectedData.slashJp, note:selectedData.note, num:selectedData.num, isChecked:this.checked});
       });
     }
     // clear btn
@@ -299,7 +298,7 @@
 
       let sentencesData = new Map();
       that.sentencesData.forEach((value, key) => {
-        sentencesData.set(key, { en:value.en, slashEn:value.slashEn, jp:value.jp, slashJp:value.slashJp, note:value.note, path:value.path, num:value.num, isChecked:false});
+        sentencesData.set(key, { en:value.en, slashEn:value.slashEn, jp:value.jp, slashJp:value.slashJp, note:value.note, num:value.num, isChecked:false});
       });
       that.sentencesData = sentencesData;
     });
@@ -362,9 +361,7 @@
     this.dictationResultBtnElm = document.querySelector('.js-dictationResultBtn');
     this.dictationSelectLangElm = document.querySelector('.js-dictationSelectLang');
     this.dictationSelectRateElm = document.querySelector('.js-dictationSelectRate');
-    this.dictationSectionElms = document.querySelectorAll('.js-dictationSection');
     this.dictationInputElm = document.querySelector('.js-dictationInput');
-    this.dictationNavElms = document.querySelectorAll('.js-dictationNav li');
     // dictation
   };
 
@@ -395,16 +392,6 @@
     else if(this.pageData=='writing') {
       note = (initialSentenceData.note) ? getNote(initialSentenceData.note, true) : '';
       this.writingTextElm.innerHTML = '<p class="main__text">' + initialSentenceData.jp + '</p>';
-    }
-    else if(this.pageData=='dictation') {
-      this.dictationAudioType = 'path';
-      this.dictationSectionElms[0].classList.remove('disp--none');
-      this.dictationSectionElms[1].classList.add('disp--none');
-      this.dictationNavElms[0].classList.add('active');
-      this.dictationNavElms[1].classList.remove('active');
-      if(initialSentenceData.path) {
-        this.dictationSectionElms[0].innerHTML = '<video playsinline autoplay controls><source src="' + initialSentenceData.path + '" type="video/mp4"></video>';
-      }
     }
   };
 
@@ -480,7 +467,7 @@
       this.speedreadingCheckBtnElm.addEventListener('click', function() {
         let id = that.sentenceDataArray[that.randomIndexArray[((cnt-2)/2)]][0];
         let value = that.sentenceDataArray[that.randomIndexArray[((cnt-2)/2)]][1];
-        that.sentencesData.set(id, { en:value.en, slashEn:value.slashEn, jp:value.jp, slashJp:value.slashJp, note:value.note, path:value.path, num:value.num, isChecked:true});
+        that.sentencesData.set(id, { en:value.en, slashEn:value.slashEn, jp:value.jp, slashJp:value.slashJp, note:value.note, num:value.num, isChecked:true});
         localStorage.setItem('sentencesData', JSON.stringify([...that.sentencesData]));
       });
     }
@@ -606,21 +593,6 @@
     }
     else if(this.pageData=='dictation') {
       this.currentSentenceData = this.sentenceDataArray[this.randomIndexArray[0]][1];
-      for(let cnt=0;cnt<2;++cnt) {
-        this.dictationNavElms[cnt].addEventListener('click', function() {
-          that.dictationAudioType = event.target.dataset.type;
-          const dictationAudioTypeIndexArray = (that.dictationAudioType=='path') ? [0,1] : [1,0];
-          that.dictationSectionElms[dictationAudioTypeIndexArray[0]].classList.remove('disp--none');
-          that.dictationSectionElms[dictationAudioTypeIndexArray[1]].classList.add('disp--none');
-          that.dictationNavElms[dictationAudioTypeIndexArray[0]].classList.add('active');
-          that.dictationNavElms[dictationAudioTypeIndexArray[1]].classList.remove('active');
-        });
-      }
-      if(!this.currentSentenceData.path) { //pathがない時はナビを表示しない
-        this.dictationSectionElms[0].classList.add('disp--none');
-        this.dictationSectionElms[1].classList.remove('disp--none');
-        this.dictationNavElms[0].parentNode.classList.add('disp--none');
-      }
 
       let isPlaying = false;
       let isInitial = true;
@@ -664,20 +636,6 @@
           isInitial = true;
           speechSynthesis.cancel();
           that.dictationBtnElm.innerHTML = '音声スタート';
-          if(that.currentSentenceData.path) {
-            that.dictationInputElm.value = '';
-            that.dictationSectionElms[0].innerHTML = '<video playsinline controls><source src="' + that.currentSentenceData.path + '" type="video/mp4"></video>';
-            that.dictationNavElms[0].parentNode.classList.remove('disp--none');
-            that.dictationNavElms[0].classList.add('active');
-            that.dictationNavElms[1].classList.remove('active');
-            that.dictationSectionElms[0].classList.remove('disp--none');
-            that.dictationSectionElms[1].classList.add('disp--none');
-          }
-          else {
-            that.dictationSectionElms[0].classList.add('disp--none');
-            that.dictationSectionElms[1].classList.remove('disp--none');
-            that.dictationNavElms[0].parentNode.classList.add('disp--none');
-          }
         }
         else {
           div.innerHTML = '<p class="main__note">' + that.currentSentenceData.en + '</p><p class="main__note">' + that.currentSentenceData.jp + '</p>';
