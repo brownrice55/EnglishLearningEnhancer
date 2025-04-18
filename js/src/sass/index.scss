@@ -131,6 +131,15 @@ $borderRadius : 4px;
       color: $colorGray;
     }
   }
+  &__settingsBtn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    background: $colorDarkGray;
+    color: $colorLightGray;
+    cursor: pointer;
+  }
   &__text {
     @include p;
     line-height: 2;

@@ -357,9 +357,10 @@
     // writing
 
     // dictation
-    this.dictationBtnElm = document.querySelector('.js-dictationBtn');
-    this.dictationPauseBtnElm = document.querySelector('.js-dictationPauseBtn');
-    this.dictationResumeBtnElm = document.querySelector('.js-dictationResumeBtn');
+    this.dictationBtnElms = document.querySelectorAll('.js-dictationBtns button');
+    this.dictationBtnElm = this.dictationBtnElms[0];
+    this.dictationPauseBtnElm = this.dictationBtnElms[1];
+    this.dictationResumeBtnElm = this.dictationBtnElms[2];
     this.dictationResultBtnElm = document.querySelector('.js-dictationResultBtn');
     this.dictationSelectLangElm = document.querySelector('.js-dictationSelectLang');
     this.dictationSelectRateElm = document.querySelector('.js-dictationSelectRate');
@@ -394,6 +395,26 @@
     else if(this.pageData=='writing') {
       note = (initialSentenceData.note) ? getNote(initialSentenceData.note, true) : '';
       this.writingTextElm.innerHTML = '<p class="main__text">' + initialSentenceData.jp + '</p>';
+    }
+  };
+  
+  Enhancer.prototype.dictationDisplayOrNotSelects = function(aOnOff, aSpan) {
+    let dictationH3Elms = document.querySelectorAll('.js-dictation h3');
+    if(aOnOff) {
+      this.selectSentences.parentNode.classList.remove('disp--none');
+      this.dictationSelectLangElm.parentNode.classList.remove('disp--none');
+      this.dictationSelectRateElm.parentNode.classList.remove('disp--none');
+      dictationH3Elms[0].classList.remove('disp--none');
+      dictationH3Elms[1].classList.remove('disp--none');
+      aSpan.textContent = '-';
+    }
+    else {
+      this.selectSentences.parentNode.classList.add('disp--none');
+      this.dictationSelectLangElm.parentNode.classList.add('disp--none');
+      this.dictationSelectRateElm.parentNode.classList.add('disp--none');
+      dictationH3Elms[0].classList.add('disp--none');
+      dictationH3Elms[1].classList.add('disp--none');
+      aSpan.textContent = '+';
     }
   };
 
@@ -598,10 +619,21 @@
       let audio = new SpeechSynthesisUtterance(this.currentSentenceData.en);
 
       const that = this;
+
+      let span = document.createElement('span');
+      span.className = 'js-dictationSettingsBtn main__settingsBtn disp--none';
+      span.textContent = '-';
+      let h1Elm = document.querySelector('.js-main h1');
+      h1Elm.appendChild(span);
+
       this.dictationBtnElm.addEventListener('click', function() {
         audio = new SpeechSynthesisUtterance(that.currentSentenceData.en);
         audio.lang = that.dictationSelectLangElm.value;
         audio.rate = that.dictationSelectRateElm.value;
+
+        span.classList.add('disp--none');
+        that.dictationDisplayOrNotSelects(0, span);
+        that.dictationResultBtnElm.disabled = false;
 
         speechSynthesis.cancel();
         speechSynthesis.speak(audio);
@@ -637,12 +669,24 @@
           this.innerHTML = '確認';
           div.remove();
           speechSynthesis.cancel();
-          that.dictationBtnElm.innerHTML = '音声スタート';
+          that.dictationBtnElm.disabled = false;
+          that.dictationPauseBtnElm.disabled = true;
+          that.dictationResumeBtnElm.disabled = true;
+
+          that.dictationInputElm.value = '';
+          that.dictationResultBtnElm.disabled = true;
+
+          span.classList.remove('disp--none');
+          let isOn = true;
+          span.addEventListener('click', function() {
+            that.dictationDisplayOrNotSelects(isOn, span);
+            isOn = !isOn;
+          });
         }
         else {
           div.innerHTML = '<p class="main__note">' + that.currentSentenceData.en + '</p><p class="main__note">' + that.currentSentenceData.jp + '</p>';
           this.before(div);
-          this.innerHTML = '次へ';
+          this.innerHTML = '次の問題へ';
         }
         ++cnt;
       });
