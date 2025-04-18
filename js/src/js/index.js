@@ -358,6 +358,8 @@
 
     // dictation
     this.dictationBtnElm = document.querySelector('.js-dictationBtn');
+    this.dictationPauseBtnElm = document.querySelector('.js-dictationPauseBtn');
+    this.dictationResumeBtnElm = document.querySelector('.js-dictationResumeBtn');
     this.dictationResultBtnElm = document.querySelector('.js-dictationResultBtn');
     this.dictationSelectLangElm = document.querySelector('.js-dictationSelectLang');
     this.dictationSelectRateElm = document.querySelector('.js-dictationSelectRate');
@@ -593,35 +595,36 @@
     }
     else if(this.pageData=='dictation') {
       this.currentSentenceData = this.sentenceDataArray[this.randomIndexArray[0]][1];
-
-      let isPlaying = false;
-      let isInitial = true;
       let audio = new SpeechSynthesisUtterance(this.currentSentenceData.en);
+
+      const that = this;
       this.dictationBtnElm.addEventListener('click', function() {
-        isPlaying = !isPlaying;
-        if(isInitial) {
-          isInitial = false;
-          this.innerHTML = '一時停止';
-          speechSynthesis.cancel();
-          audio = new SpeechSynthesisUtterance(that.currentSentenceData.en);
-          audio.lang = that.dictationSelectLangElm.value;
-          audio.rate = that.dictationSelectRateElm.value;
-          speechSynthesis.speak(audio);
-        }
-        else {
-          if(isPlaying) {
-            this.innerHTML = '一時停止';
-            speechSynthesis.resume();
-          }
-          else {
-            this.innerHTML = '再開';
-            speechSynthesis.pause();
-          }
-        }
-        audio.onend = function() {
+        audio = new SpeechSynthesisUtterance(that.currentSentenceData.en);
+        audio.lang = that.dictationSelectLangElm.value;
+        audio.rate = that.dictationSelectRateElm.value;
+
+        speechSynthesis.cancel();
+        speechSynthesis.speak(audio);
+        this.disabled = true;
+        that.dictationPauseBtnElm.disabled = false;
+        audio.onend = () => {
+          that.dictationBtnElm.disabled = false;
           that.dictationBtnElm.innerHTML = '音声スタート';
-          isInitial = true;
+          that.dictationPauseBtnElm.disabled = true;
+          that.dictationResumeBtnElm.disabled = true;
         };
+      });
+
+      this.dictationPauseBtnElm.addEventListener('click', function() {
+        speechSynthesis.pause();
+        this.disabled = true;
+        that.dictationResumeBtnElm.disabled = false;
+      });
+      
+      this.dictationResumeBtnElm.addEventListener('click', function() {
+        speechSynthesis.resume();
+        this.disabled = true;
+        that.dictationPauseBtnElm.disabled = false;
       });
 
       this.dictationResultBtnElm.addEventListener('click', function() {
@@ -633,7 +636,6 @@
           that.currentSentenceData = that.sentenceDataArray[that.randomIndexArray[((cnt+1)/2)]][1];
           this.innerHTML = '確認';
           div.remove();
-          isInitial = true;
           speechSynthesis.cancel();
           that.dictationBtnElm.innerHTML = '音声スタート';
         }
