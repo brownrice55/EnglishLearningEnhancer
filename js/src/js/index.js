@@ -439,15 +439,15 @@
       this.currentSentenceData = this.sentenceDataArray[this.randomIndexArray[0]][1];
 
       const displayTimeAndWpm = () => {
-        that.timeTaken = Date.now() - that.startTime;
-        let currentTime = new Date(that.timeTaken + that.stopTime);
+        this.timeTaken = Date.now() - this.startTime;
+        let currentTime = new Date(this.timeTaken + this.stopTime);
         let m = String(currentTime.getMinutes()).padStart(2, '0');
         let s = String(currentTime.getSeconds()).padStart(2, '0');
         let ms = String(currentTime.getMilliseconds()).padStart(3, '0');
-        let wpmClass = (that.wpm>=that.selectedWpm) ? '' : ' class="alert"';
-        that.wpm = Math.round(that.currentSentenceData.num/(that.timeTaken/1000)*60);
-        that.timeElm.innerHTML = m + ':' + s + '.' + ms + '　<span' + wpmClass + '>WPM:' + that.wpm + '</span>';
-        that.timerID = setTimeout(displayTimeAndWpm, 30);
+        let wpmClass = (this.wpm>=this.selectedWpm) ? '' : ' class="alert"';
+        this.wpm = Math.round(this.currentSentenceData.num/(this.timeTaken/1000)*60);
+        this.timeElm.innerHTML = m + ':' + s + '.' + ms + '　<span' + wpmClass + '>WPM:' + this.wpm + '</span>';
+        this.timerID = setTimeout(displayTimeAndWpm, 30);
       };
 
       this.speedreadingBtnElm.addEventListener('click', function() {
